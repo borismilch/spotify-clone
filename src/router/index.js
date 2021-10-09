@@ -1,23 +1,62 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Home from "../views/Home.vue";
-
+import firebase from "firebase/compat/app";
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/",
     name: "Home",
-    component: Home,
+    meta: { auth: true },
+    component: () => import("../views/Home.vue"),
   },
   {
-    path: "/about",
-    name: "About",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue"),
+    path: "/auth",
+    name: "Auth",
+    meta: { auth: false },
+    component: () => import("../views/Auth.vue"),
+  },
+  {
+    path: "/register",
+    name: "Register",
+    meta: { auth: false },
+    component: () => import("../views/Register.vue"),
+  },
+  {
+    path: "/create",
+    name: "Create",
+    meta: { auth: true },
+    component: () => import("../views/Create.vue"),
+  },
+  {
+    path: "/lib",
+    name: "Lib",
+    meta: { auth: true },
+    component: () => import("../views/Lib.vue"),
+  },
+  {
+    path: "/likes",
+    name: "Likes",
+    meta: { auth: true },
+    component: () => import("../views/Likes.vue"),
+  },
+  {
+    path: "/user",
+    name: "User",
+    meta: { auth: true },
+    component: () => import("../views/User.vue"),
+  },
+  {
+    path: "/search",
+    name: "Search",
+    meta: { auth: true },
+    component: () => import("../views/Search.vue"),
+  },
+  {
+    path: "/detail/:id",
+    name: "Detail",
+    meta: { auth: true, player: true },
+    component: () => import("../views/Detail.vue"),
   },
 ];
 
@@ -25,6 +64,14 @@ const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  const currentUser = firebase.auth().currentUser;
+  const requiredAuth = to.matched.some((record) => record.meta.auth);
+  if (requiredAuth && !currentUser) {
+    next("/auth?message=noUser");
+  } else next();
 });
 
 export default router;
