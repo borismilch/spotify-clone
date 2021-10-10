@@ -83,7 +83,7 @@
               hov-scale
             "
           >
-            <v-icon class="text-xl">mdi-play</v-icon>
+            <v-icon class="text-xl">{{song.id === $route.params.id && song.play ? 'mdi-pause' : 'mdi-play'}}</v-icon>
           </div>
           <span class="spa">{{ navContent }}</span>
         </div>
@@ -107,7 +107,7 @@ export default {
   }),
   components: { UserDropdown, Fade },
   computed: {
-    ...mapGetters(["song", "albums"]),
+    ...mapGetters(["song", "albums", 'controller']),
     isScrolled() {
       return this.$refs.navBar.parent;
     },
@@ -124,8 +124,13 @@ export default {
     },
     async setActiveAlbum() {
       const activeAlb = this.albums.find((a) => a.id === this.$route.params.id);
+      const isAc = !!(activeAlb.tracks.find(t => t.ref === this.song.ref))
+      console.log(isAc)
       if (this.song ? this.song.id !== this.$route.params.id : true) {
         await this.$store.dispatch("getFirstSong", [activeAlb.id, 0]);
+      }
+      if (this.song ? this.song.id === this.$route.params.id && isAc : false) {
+        this.$store.commit('changeController', !this.controller)
       }
     },
   },

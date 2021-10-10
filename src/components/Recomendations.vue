@@ -43,13 +43,14 @@
               </div>
             </router-link>
             <div
-              @click="setActiveAlbum(r.id)"
+              @click="setActiveAlbum(idx)"
               class="
                 rec-play
                 rounded-full
                 w-10
                 h-10
                 shadow
+                cursor-pointer
                 flex
                 items-center
                 justify-center
@@ -62,7 +63,7 @@
                 bottom-4
               "
             >
-              <v-icon>mdi-play</v-icon>
+              <v-icon>{{ (song ? r.id === song.id && song.play : false) ? "mdi-pause" : "mdi-play" }}</v-icon>
             </div>
           </div>
         </div>
@@ -81,7 +82,7 @@ export default {
     bgCol: "rgb(207, 214, 219)",
   }),
   computed: {
-    ...mapGetters(["albums", "song"]),
+    ...mapGetters(["albums", "song", 'controller']),
     borderedItems() {
       return this.albums.slice(0, 4);
     },
@@ -91,9 +92,16 @@ export default {
   },
   methods: {
     analyze,
-    async setActiveAlbum(id) {
-      if (this.song ? this.song.id !== id : true) {
-        await this.$store.dispatch("getFirstSong", [id, 0]);
+    async setActiveAlbum(idx) {
+      if (this.song? this.song.id !== this.albums[idx].id : true) {
+        await this.$store.dispatch("getFirstSong", [
+          this.itemsToShow[idx].id,
+          0,
+        ]);
+      }
+      else if (this.song? this.song.id === this.albums[idx].id : false) {
+        console.log('sss')
+        this.$store.commit('changeController', !this.controller)
       }
     },
   },

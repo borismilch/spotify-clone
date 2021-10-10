@@ -97,13 +97,14 @@
       </div>
       <div class="w-3/6 relative osobiy mt-4" style="max-width: 550px">
         <input
+          @input="track.currentTime = $event.target.value"
           :disabled="!song"
           type="range"
           class="w-full cursor-pointer disabled"
           min="0"
           :max="song ? song.duration : 0"
           id="track"
-          v-model="currentTime"
+          :value="currentTime"
         />
       </div>
     </div>
@@ -162,25 +163,41 @@ export default {
     volume(val) {
       this.track.volume = val / 100;
     },
-    currentTime(val) {
-      this.track.currentTime = val;
-    },
     song: {
       deep: true,
-      handler(val) {
-        if (this.track) {
+      handler(val, oldval) {
+        console.log(oldval.id, val.id)
+        if (!this.track) {
+          this.track = new Audio(val.url);
+          this.track.load(); //load the new source
+          this.track.play(); //play
+          this.play = true
+          this.track.addEventListener("timeupdate", this.handleMusicProgress);
+          this.$store.commit('changePlay', this.play)
+        }
+        else if (oldval.id !== val.id && this.track) {
           this.track.setAttribute("src", val.url); //change the source
           this.track.load(); //load the new source
           this.track.play(); //play
-        } else {
-          this.track = new Audio(this.song.url);
-          this.track.play();
-        }
+          this.play = true
+          this.$store.commit('changePlay', this.play)
+        } 
+        else if (oldval.ref !== val.ref && this.track && oldval.id === val.id ) {
+          this.track.setAttribute("src", val.url); //change the source
+          this.track.load(); //load the new source
+          this.track.play(); //play
+          this.play = true
+          this.$store.commit('changePlay', this.play)
+        } 
       },
+    },
+    controller () {
+      console.log('ddddddvdwd')
+      this.musicPlay()
     },
   },
   computed: {
-    ...mapGetters(["song"]),
+    ...mapGetters(["song", 'controller']),
     vol() {
       return this.volume > 70
         ? "volume-high"
@@ -195,9 +212,14 @@ export default {
         ? "mdi-play-circle-outline"
         : "mdi-pause-circle-outline";
     },
+    
   },
 
   methods: {
+    handleMusicProgress (e) {
+      console.log(Math.floor(e.target.currentTime))
+      this.currentTime = e.target.currentTime
+    },
     emitImage(e) {
       this.$emit("emitImage", e);
     },
@@ -206,13 +228,12 @@ export default {
     },
     musicPlay() {
       if (this.song) {
-        this.play = !this.play;
-        if (this.play) {
-          this.track.play();
-        } else {
-          this.track.pause();
-        }
-      } else {
+        this.play = !this.play
+        if (this.play) { this.track.play() }
+        else { this.track.pause() }
+        this.$store.commit('changePlay', this.play)
+      } 
+      else {
         this.$emit("pageMessage", "NO_SONG_SELECTED");
         console.log("jjj");
       }

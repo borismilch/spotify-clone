@@ -26,7 +26,7 @@
         v-for="(tr, idx) in tracks"
         :key="idx"
       >
-        <v-icon class="only-hover none">mdi-play</v-icon>
+        <v-icon @click.stop="changeActivity(idx)" class="only-hover none">{{ (song ? song.id === id && tr.ref === song.ref && song.play : false)  ? 'mdi-pause' : 'mdi-play' }}</v-icon>
         <span class="w-6 normal-text index text-center">{{ idx + 1 }}</span>
 
         <div class="flex flex-col ml-2 flex-1" style="width: 50%">
@@ -62,6 +62,7 @@ import { mapGetters } from "vuex";
 export default {
   data: () => ({
     scroll: 0,
+    play: true
   }),
   props: {
     id: String,
@@ -84,13 +85,24 @@ export default {
       const activeAlb = this.albums.find((a) => a.id === this.$route.params.id);
       if (
         this.song
-          ? this.song.id === this.$route.params.id &&
+          ? 
             this.song.ref !== activeAlb.tracks[idx].ref
           : true
       ) {
         await this.$store.dispatch("getFirstSong", [activeAlb.id, idx]);
+        this.$store.commit('changePlay', true)
       }
     },
+    async changeActivity (idx) {
+      if (this.song.ref !== this.tracks[idx].ref) {
+        await this.setActiveAlbum(idx)
+      }
+      else {
+
+        this.play = !this.play
+        this.$store.commit(this.play)
+      }
+    }
   },
   computed: {
     ...mapGetters(["song", "albums"]),
