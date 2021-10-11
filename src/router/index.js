@@ -58,6 +58,12 @@ const routes = [
     meta: { auth: true, player: true },
     component: () => import("../views/Detail.vue"),
   },
+  {
+    path: "/playlist",
+    name: "PlayList",
+    meta: { auth: true, player: true },
+    component: () => import("../views/PlayList.vue"),
+  }
 ];
 
 const router = new VueRouter({

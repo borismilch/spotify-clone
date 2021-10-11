@@ -1,26 +1,29 @@
 <template>
-  <div class="flex content-spacing flex-col">
-    <div class="table-head" style="margin-bottom: 16px; z-index: 10">
-      <span class="list-title">Топ треків цього місяця</span>
-      <div class="flex justify-beetween mt-1">
-        <span class="normal-font flex-1">Видні тільки для тебе</span>
-        <span class="more" v-if="trackList.length > 4">Ще</span>
-      </div>
-    </div>
+  <div class="flex flex-col">
+    <slot></slot>
     <ul style="z-index: 10">
       <li
         class="flex justify-beetween relative py-2 px-2 items-center lich"
-        v-for="(li, idx) in trackShow"
+        :class="{'li-active': li.ref === song.ref }"
+        v-for="(li, idx) in this.$route.meta.player ? tracks : trackShow"
         :key="idx"
+        @click="setActiveAlbum(li.ref)"
       >
-        <v-icon class="only-hover none">mdi-play</v-icon>
-        <span class="w-6 normal-text index text-center">{{ idx + 1 }}</span>
+
+        <v-icon 
+          class="only-hover none"
+          @click="changeActivity(li.ref)"
+        >
+          {{ (song ? li.ref === song.ref && song.play : false)  ? 'mdi-pause' : 'mdi-play' }}
+          
+        </v-icon>
+        <span class="w-6 hbdd normal-text index text-center">{{ idx + 1 }}</span>
         <div style="width: 40px" class="mx-4">
           <v-img
             class="h-10 rounded-sm"
-            style="width: 40px"
-            contain
-            :src="li.img"
+            style="width: 40px; height: 40px !important; object-fit:cover"
+            
+            :src="li.albumImg"
           ></v-img>
         </div>
         <div class="flex flex-col" style="width: 50%">
@@ -36,14 +39,14 @@
             >{{ li.author }}</span
           >
         </div>
-        <span class="normal-font flex-1">{{ li.description }}</span>
+        <span class="normal-font flex-1">{{ li.desc }}</span>
         <div class="flex items-center gap-4">
           <v-icon
             @click="li.liked = !li.liked"
             :style="{ color: li.liked ? '#1ed760' : '#a7a7a7' }"
             >{{ li.liked ? "mdi-heart" : "mdi-heart-outline" }}</v-icon
           >
-          <span class="normal-font">{{ li.duration }}</span>
+          <span class="normal-font">{{ fmtMSS(li.duration) }}</span>
           <v-icon class="ubuntu">mdi-dots-horizontal</v-icon>
         </div>
       </li>
@@ -52,85 +55,67 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+import { fmtMSS } from '../utils/secs.func'
 import doom from "../assets/doom.jpg";
 export default {
   data: () => ({
     doom,
-    trackList: [
-      {
-        title: "The only thing they fear is you",
-        author: "Mick Gordon",
-        liked: false,
-        description: "Doom (Original Game Soundtrack)",
-        duration: "4:17",
-        active: false,
-        img: doom,
-      },
-      {
-        title: "The only thing they fear is you",
-        author: "Mick Gordon",
-        liked: false,
-        description: "Doom (Original Game Soundtrack)",
-        duration: "4:17",
-        active: false,
-        img: doom,
-      },
-      {
-        title: "The only thing they fear is you",
-        author: "Mick Gordon",
-        liked: false,
-        description: "Doom (Original Game Soundtrack)",
-        duration: "4:17",
-        active: false,
-        img: doom,
-      },
-      {
-        title: "The only thing they fear is you",
-        author: "Mick Gordon",
-        liked: false,
-        description: "Doom (Original Game Soundtrack)",
-        duration: "4:17",
-        active: false,
-        img: doom,
-      },
-      {
-        title: "The only thing they fear is you",
-        author: "Mick Gordon",
-        liked: false,
-        description: "Doom (Original Game Soundtrack)",
-        duration: "4:17",
-        active: false,
-        img: doom,
-      },
-      {
-        title: "The only thing they fear is you",
-        author: "Mick Gordon",
-        liked: false,
-        description: "Doom (Original Game Soundtrack)",
-        duration: "4:17",
-        active: false,
-        img: doom,
-      },
-      {
-        title: "The only thing they fear is you",
-        author: "Mick Gordon",
-        liked: false,
-        description: "Doom (Original Game Soundtrack)",
-        duration: "4:17",
-        active: false,
-        img: doom,
-      },
-    ],
   }),
   computed: {
+    ...mapGetters(['song', 'albums']),
     trackShow() {
       return this.trackList.slice(0, 4);
     },
   },
+  methods: { 
+    fmtMSS,
+     async setActiveAlbum(ref) {
+      const activeAlb = this.albums.find((a) => a.id === this.song.id);
+      let idx = activeAlb.tracks.findIndex(t => t.ref === ref)
+      if (
+        this.song
+          ? 
+            this.song.ref !== activeAlb.tracks[idx].ref
+          : true
+      ) {
+        await this.$store.dispatch("getFirstSong", [activeAlb.id, idx]);
+        this.$store.commit('changePlay', true)
+      }
+    },
+    async changeActivity (ref) {
+      let idx = this.tracks.findIndex(t => t.ref === ref)
+      if (this.song.ref !== this.tracks[idx].ref) {
+        await this.setActiveAlbum(idx)
+      }
+      else {
+        this.play = !this.play
+        this.$store.commit('changeController',this.play)
+      }
+    } 
+  },
+  props: {
+    tracks: Array,
+  }
 };
 </script>
 
 <style lang="scss" scoped>
+.li-active {
+
+  .only-hover {
+    display: block !important;
+  }
+  .index {
+    display: none !important;
+  }
+  .normal-font-lg, .hbdd {
+    color: #1ed760;
+  }
+  .ubuntu {
+    opacity: 1 !important;
+  }
+}
 .z-50 {
   z-index: 50 !important;
 }
@@ -171,6 +156,7 @@ export default {
   opacity: 0;
 }
 .lich {
+  
   cursor: pointer;
   &:hover {
     background: hsla(0, 0%, 100%, 0.07);

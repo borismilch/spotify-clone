@@ -115,12 +115,10 @@ export default {
     },
     async setActiveAlbum(idx) {
       if (this.song? this.song.id !== this.albums[idx].id : true) {
-        console.log('dsssssssss')
         await this.$store.dispatch("getFirstSong", [
           this.itemsToShow[idx].id,
           0,
         ]);
-      
       }
       else if (this.song? this.song.id === this.albums[idx].id : false) {
         console.log('sss')

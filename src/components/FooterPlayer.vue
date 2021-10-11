@@ -69,13 +69,13 @@
       <div class="flex items-center text-sp-ligntest gap-4">
         <v-icon class="icon-hover">mdi-swap-horizontal</v-icon>
 
-        <v-icon class="icon-hover">mdi-skip-backward</v-icon>
+        <v-icon class="icon-hover" :disabled="!song" @click="skipBackward">mdi-skip-backward</v-icon>
         <v-icon
           @click="musicPlay()"
           class="icon-hover text-4xl duration-200 text-white scaling"
           >{{ isPlay }}</v-icon
         >
-        <v-icon class="icon-hover">mdi-skip-forward</v-icon>
+        <v-icon class="icon-hover" :disabled="!song"  @click="skipForward">mdi-skip-forward</v-icon>
 
         <v-icon @click="refresh()" class="icon-hover"
           >mdi-refresh-circle</v-icon
@@ -109,7 +109,9 @@
       </div>
     </div>
     <div class="flex text-sp-ligntest gap-2 items-center">
-      <v-icon class="icon-hover">mdi-playlist-music-outline</v-icon>
+     <router-link to="/playlist"> 
+     <v-icon class="icon-hover">mdi-playlist-music-outline</v-icon>
+     </router-link>
       <v-icon icon="laptop-house" class="icon-hover">mdi-cellphone-link</v-icon>
       <div class="w-7">
         <v-icon class="icon-hover" color="#B3B3B3" @click="volume = 0"
@@ -166,16 +168,16 @@ export default {
     song: {
       deep: true,
       handler(val, oldval) {
-        console.log(oldval.id, val.id)
         if (!this.track) {
           this.track = new Audio(val.url);
           this.track.load(); //load the new source
           this.track.play(); //play
           this.play = true
           this.track.addEventListener("timeupdate", this.handleMusicProgress);
+          this.track.addEventListener("ended", async () => { await this.$store.dispatch('nextSong') })
           this.$store.commit('changePlay', this.play)
         }
-        else if (oldval.id !== val.id && this.track) {
+        else if (oldval? oldval.id !== val.id && this.track : false) {
           this.track.setAttribute("src", val.url); //change the source
           this.track.load(); //load the new source
           this.track.play(); //play
@@ -192,7 +194,6 @@ export default {
       },
     },
     controller () {
-      console.log('ddddddvdwd')
       this.musicPlay()
     },
   },
@@ -244,6 +245,12 @@ export default {
         this.play ? this.track.play() : this.track.pause();
       } else this.$emit("pageMessage", "NO_SONG_SELECTED");
     },
+    async skipBackward () {
+      await this.$store.dispatch('prevSong')
+    },
+    async skipForward () {
+      await this.$store.dispatch('nextSong')
+    }
   },
 };
 </script>
@@ -269,7 +276,7 @@ export default {
 }
 #track {
   outline: none;
-  height: 5px;
+  height: 3px;
   border-radius: 10px;
   background: #2a2a2a;
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.2);
@@ -291,6 +298,11 @@ export default {
 .scaling {
   &:hover {
     transform: scale(0.8);
+  }
+}
+.icon-hover {
+  &:disabled {
+    opacity: 0.5;
   }
 }
 .hovi {

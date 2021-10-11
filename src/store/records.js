@@ -39,5 +39,6 @@ export default {
   },
   getters: {
     albums: (s) => s.albums,
+
   },
 };

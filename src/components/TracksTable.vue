@@ -4,17 +4,7 @@
       class="table-head"
       style="margin-bottom: 16px; z-index: 10; position: sticky; top: 56px"
     >
-      <div>
-        <div class="flex justify-beetween mt-1 items-center">
-          <div class="flex flex-1 items-center gap-3">
-            <span class="list-title">#</span>
-            <span class="normal-font flex-1">Назва</span>
-          </div>
-          <span class="more" style="width: 80px">
-            <v-icon style="font-size: 28px">mdi-clock</v-icon>
-          </span>
-        </div>
-      </div>
+    <slot> </slot>
     </div>
     <ul style="z-index: 20">
       <li
@@ -98,15 +88,15 @@ export default {
         await this.setActiveAlbum(idx)
       }
       else {
-
         this.play = !this.play
-        this.$store.commit(this.play)
+        this.$store.commit('changeController',this.play)
       }
     }
   },
   computed: {
     ...mapGetters(["song", "albums"]),
   },
+  
 };
 </script>
 
