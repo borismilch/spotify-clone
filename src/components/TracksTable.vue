@@ -4,7 +4,7 @@
       class="table-head"
       style="margin-bottom: 16px; z-index: 10; position: sticky; top: 56px"
     >
-    <slot> </slot>
+      <slot> </slot>
     </div>
     <ul style="z-index: 20">
       <li
@@ -16,7 +16,11 @@
         v-for="(tr, idx) in tracks"
         :key="idx"
       >
-        <v-icon @click.stop="changeActivity(idx)" class="only-hover none">{{ (song ? song.id === id && tr.ref === song.ref && song.play : false)  ? 'mdi-pause' : 'mdi-play' }}</v-icon>
+        <v-icon @click.stop="changeActivity(idx)" class="only-hover none">{{
+          (song ? song.id === id && tr.ref === song.ref && song.play : false)
+            ? "mdi-pause"
+            : "mdi-play"
+        }}</v-icon>
         <span class="w-6 normal-text index text-center">{{ idx + 1 }}</span>
 
         <div class="flex flex-col ml-2 flex-1" style="width: 50%">
@@ -35,7 +39,12 @@
 
         <div class="flex items-center gap-4">
           <v-icon
-            @click="tr.liked = !tr.liked"
+            @click.stop="
+              tr.liked = !tr.liked;
+              tr.liked
+                ? like([tr.parent, tr.ref])
+                : dislike([tr.parent, tr.ref]);
+            "
             :style="{ color: tr.liked ? '#1ed760' : '#a7a7a7' }"
             >{{ tr.liked ? "mdi-heart" : "mdi-heart-outline" }}</v-icon
           >
@@ -52,7 +61,7 @@ import { mapGetters } from "vuex";
 export default {
   data: () => ({
     scroll: 0,
-    play: true
+    play: true,
   }),
   props: {
     id: String,
@@ -73,30 +82,31 @@ export default {
     },
     async setActiveAlbum(idx) {
       const activeAlb = this.albums.find((a) => a.id === this.$route.params.id);
-      if (
-        this.song
-          ? 
-            this.song.ref !== activeAlb.tracks[idx].ref
-          : true
-      ) {
+      if (this.song ? this.song.ref !== activeAlb.tracks[idx].ref : true) {
         await this.$store.dispatch("getFirstSong", [activeAlb.id, idx]);
-        this.$store.commit('changePlay', true)
+        this.$store.commit("changePlay", true);
       }
     },
-    async changeActivity (idx) {
+    async changeActivity(idx) {
       if (this.song.ref !== this.tracks[idx].ref) {
-        await this.setActiveAlbum(idx)
+        await this.setActiveAlbum(idx);
+      } else {
+        this.play = !this.play;
+        this.$store.commit("changeController", this.play);
       }
-      else {
-        this.play = !this.play
-        this.$store.commit('changeController',this.play)
-      }
-    }
+    },
+    async like(params) {
+      this.$emit("pageMessage", "USER_LIKED");
+      await this.$store.dispatch("like", params);
+    },
+    async dislike(params) {
+      this.$emit("pageMessage", "USER_DISLIKED");
+      await this.$store.dispatch("dislike", params);
+    },
   },
   computed: {
     ...mapGetters(["song", "albums"]),
   },
-  
 };
 </script>
 

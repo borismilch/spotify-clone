@@ -56,8 +56,14 @@
       </div>
       <v-icon
         v-if="song"
-        class="text-sp-green icon-hover mx-3 text-lg cursor-pointer"
-        >mdi-heart-outline</v-icon
+        class="text-sp-green icon-hover mx-3 text-lg cursor-pointer"  @click.stop="
+          song.liked = !song.liked;
+          song.liked
+            ? like([song.id, song.ref])
+            : dislike([song.id, song.ref]);
+            "
+        :style="{ color: song.liked ? '#1ed760' : '#a7a7a7' }"
+        >{{ song.liked ? "mdi-heart" : "mdi-heart-outline" }}</v-icon
       >
       <v-icon
         v-if="song"
@@ -69,13 +75,17 @@
       <div class="flex items-center text-sp-ligntest gap-4">
         <v-icon class="icon-hover">mdi-swap-horizontal</v-icon>
 
-        <v-icon class="icon-hover" :disabled="!song" @click="skipBackward">mdi-skip-backward</v-icon>
+        <v-icon class="icon-hover" :disabled="!song" @click="skipBackward"
+          >mdi-skip-backward</v-icon
+        >
         <v-icon
           @click="musicPlay()"
           class="icon-hover text-4xl duration-200 text-white scaling"
           >{{ isPlay }}</v-icon
         >
-        <v-icon class="icon-hover" :disabled="!song"  @click="skipForward">mdi-skip-forward</v-icon>
+        <v-icon class="icon-hover" :disabled="!song" @click="skipForward"
+          >mdi-skip-forward</v-icon
+        >
 
         <v-icon @click="refresh()" class="icon-hover"
           >mdi-refresh-circle</v-icon
@@ -109,9 +119,9 @@
       </div>
     </div>
     <div class="flex text-sp-ligntest gap-2 items-center">
-     <router-link to="/playlist"> 
-     <v-icon class="icon-hover">mdi-playlist-music-outline</v-icon>
-     </router-link>
+      <router-link to="/playlist">
+        <v-icon class="icon-hover">mdi-playlist-music-outline</v-icon>
+      </router-link>
       <v-icon icon="laptop-house" class="icon-hover">mdi-cellphone-link</v-icon>
       <div class="w-7">
         <v-icon class="icon-hover" color="#B3B3B3" @click="volume = 0"
@@ -172,33 +182,37 @@ export default {
           this.track = new Audio(val.url);
           this.track.load(); //load the new source
           this.track.play(); //play
-          this.play = true
+          this.play = true;
           this.track.addEventListener("timeupdate", this.handleMusicProgress);
-          this.track.addEventListener("ended", async () => { await this.$store.dispatch('nextSong') })
-          this.$store.commit('changePlay', this.play)
+          this.track.addEventListener("ended", async () => {
+            await this.$store.dispatch("nextSong");
+          });
+          this.$store.commit("changePlay", this.play);
+        } else if (oldval ? oldval.id !== val.id && this.track : false) {
+          this.track.setAttribute("src", val.url); //change the source
+          this.track.load(); //load the new source
+          this.track.play(); //play
+          this.play = true;
+          this.$store.commit("changePlay", this.play);
+        } else if (
+          oldval.ref !== val.ref &&
+          this.track &&
+          oldval.id === val.id
+        ) {
+          this.track.setAttribute("src", val.url); //change the source
+          this.track.load(); //load the new source
+          this.track.play(); //play
+          this.play = true;
+          this.$store.commit("changePlay", this.play);
         }
-        else if (oldval? oldval.id !== val.id && this.track : false) {
-          this.track.setAttribute("src", val.url); //change the source
-          this.track.load(); //load the new source
-          this.track.play(); //play
-          this.play = true
-          this.$store.commit('changePlay', this.play)
-        } 
-        else if (oldval.ref !== val.ref && this.track && oldval.id === val.id ) {
-          this.track.setAttribute("src", val.url); //change the source
-          this.track.load(); //load the new source
-          this.track.play(); //play
-          this.play = true
-          this.$store.commit('changePlay', this.play)
-        } 
       },
     },
-    controller () {
-      this.musicPlay()
+    controller() {
+      this.musicPlay();
     },
   },
   computed: {
-    ...mapGetters(["song", 'controller']),
+    ...mapGetters(["song", "controller", "likesVal"]),
     vol() {
       return this.volume > 70
         ? "volume-high"
@@ -213,13 +227,15 @@ export default {
         ? "mdi-play-circle-outline"
         : "mdi-pause-circle-outline";
     },
-    
+  },
+  mounted() {
+    console.log(this.likesVal);
   },
 
   methods: {
-    handleMusicProgress (e) {
-      console.log(Math.floor(e.target.currentTime))
-      this.currentTime = e.target.currentTime
+    handleMusicProgress(e) {
+      console.log(Math.floor(e.target.currentTime));
+      this.currentTime = e.target.currentTime;
     },
     emitImage(e) {
       this.$emit("emitImage", e);
@@ -229,12 +245,14 @@ export default {
     },
     musicPlay() {
       if (this.song) {
-        this.play = !this.play
-        if (this.play) { this.track.play() }
-        else { this.track.pause() }
-        this.$store.commit('changePlay', this.play)
-      } 
-      else {
+        this.play = !this.play;
+        if (this.play) { 
+          this.track.play();
+        } else {
+          this.track.pause();
+        }
+        this.$store.commit("changePlay", this.play);
+      } else {
         this.$emit("pageMessage", "NO_SONG_SELECTED");
         console.log("jjj");
       }
@@ -245,12 +263,21 @@ export default {
         this.play ? this.track.play() : this.track.pause();
       } else this.$emit("pageMessage", "NO_SONG_SELECTED");
     },
-    async skipBackward () {
-      await this.$store.dispatch('prevSong')
+    async skipBackward() {
+      await this.$store.dispatch("prevSong");
     },
-    async skipForward () {
-      await this.$store.dispatch('nextSong')
-    }
+    async skipForward() {
+      await this.$store.dispatch("nextSong");
+    },
+
+    async like(params) {
+      this.$emit("pageMessage", "USER_LIKED");
+      await this.$store.dispatch("like", params);
+    },
+    async dislike(params) {
+      this.$emit("pageMessage", "USER_DISLIKED");
+      await this.$store.dispatch("dislike", params);
+    },
   },
 };
 </script>

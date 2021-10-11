@@ -6,7 +6,7 @@ import store from "./store";
 import vuetify from "./plugins/vuetify";
 
 import loaderMixin from "./mixins/loading.mixin";
-
+import dateFilter from "./filters/time.filter";
 import firebase from "firebase/compat";
 const firebaseConfig = {
   apiKey: "AIzaSyAqXbv8P9IAuMjFKVe_uVBe4YmvcTZTiqQ",
@@ -22,6 +22,7 @@ firebase.initializeApp(firebaseConfig);
 
 import "./css/style.css";
 Vue.config.productionTip = false;
+Vue.filter("date", dateFilter);
 Vue.mixin("loader", loaderMixin);
 new Vue({
   router,

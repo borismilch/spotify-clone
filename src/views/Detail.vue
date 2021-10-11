@@ -30,18 +30,22 @@
         <span class="dots-w">...</span>
       </div>
       <div class="z-10" style="padding: 0px 32px 0px 32px">
-        <TrackTable :id="current.id" :tracks="current.tracks" >
+        <TrackTable
+          @pageMessage="$emit('pageMessage', $event)"
+          :id="current.id"
+          :tracks="current.tracks"
+        >
           <div>
-        <div class="flex justify-beetween mt-1 items-center">
-          <div class="flex flex-1 items-center gap-3">
-            <span class="list-title">#</span>
-            <span class="normal-font flex-1">Назва</span>
+            <div class="flex justify-beetween mt-1 items-center">
+              <div class="flex flex-1 items-center gap-3">
+                <span class="list-title">#</span>
+                <span class="normal-font flex-1">Назва</span>
+              </div>
+              <span class="more" style="width: 80px">
+                <v-icon style="font-size: 28px">mdi-clock</v-icon>
+              </span>
+            </div>
           </div>
-          <span class="more" style="width: 80px">
-            <v-icon style="font-size: 28px">mdi-clock</v-icon>
-          </span>
-        </div>
-      </div>
         </TrackTable>
         <Recomends
           :title="'Відкриті плейлісти'"

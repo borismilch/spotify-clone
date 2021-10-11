@@ -6,4 +6,6 @@ export default {
   "auth/wrong-password": { type: "error", message: "Невірний пароль" },
   "profile-changed": { type: "success", message: "Зміни успішно збережено" },
   NO_SONG_SELECTED: { type: "error", message: "Ви не вибрали пісню" },
+  USER_LIKED: { type: "success", message: "Додано у вподобайки" },
+  USER_DISLIKED: { type: "success", message: "Видалено з вподобайок" },
 };

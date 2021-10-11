@@ -37,7 +37,7 @@ const routes = [
   {
     path: "/likes",
     name: "Likes",
-    meta: { auth: true },
+    meta: { auth: true, player: true },
     component: () => import("../views/Likes.vue"),
   },
   {
@@ -63,7 +63,7 @@ const routes = [
     name: "PlayList",
     meta: { auth: true, player: true },
     component: () => import("../views/PlayList.vue"),
-  }
+  },
 ];
 
 const router = new VueRouter({

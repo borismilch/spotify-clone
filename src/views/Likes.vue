@@ -2,83 +2,160 @@
   <div>
     <Loader v-if="loading" />
     <div v-show="!loading">
-      <div class="flex user-profile" :style="{ 'background-color': backColor }">
+      <div class="flex user-profile" style="background-color: rgb(80, 56, 160)">
         <div class="lay"></div>
         <div class="user-credentials flex cursor-pointer" style="z-index: 10">
           <div class="user-avatar" style="position: relative">
             <v-img
               width="100%"
               height="100%"
-              :src="current.src"
-              class="shadow-av"
+              :src="LikesLogo"
+              class="shadow-av rounded"
               alt=""
             />
           </div>
           <div class="user-info flex flex-col mx-6 justify-end mb-4">
-            <span class="detail-text">Альбом</span>
-            <h1 class="detail-title font-extrabold">{{ current.title }}</h1>
-            <div class="flex"></div>
+            <span class="detail-text">Плейліст</span>
+            <h1 class="fav-title-big font-extrabold">Улюблені треки</h1>
+            <div class="flex items-center">
+              <v-img
+                :src="user.avatar"
+                class="rounded-circle mr-2"
+                style="
+                  width: 28px;
+                  height: 28px;
+                  object-fit: cover;
+                  flex: 0 0 auto !important;
+                "
+              />
+              <span class="author-title">{{ user.name }}</span>
+              <li class="text-tracks ml-2">
+                <span style="position: relative; left: -10px"
+                  >{{ current.tracks.length }} {{ tracksCountLabel }}</span
+                >
+              </li>
+            </div>
           </div>
         </div>
       </div>
       <div
         class="lay2 z-10 absolute"
-        :style="{ 'background-color': backColor }"
+        style="background-color: rgb(80, 56, 160)"
       ></div>
       <div class="lay3 z-10 absolute"></div>
-      <div style="z-index-50">
-        <span class="dots-w">...</span>
-      </div>
+
       <div class="z-10" style="padding: 0px 32px 0px 32px">
-        <TrackTable :id="current.id" :tracks="current.tracks" />
-        <Recomends
-          :title="'Відкриті плейлісти'"
-          :template="albums"
-          :isAuthors="false"
-        />
+        <TrackTable
+          @pageMessage="$emit('pageMessage', $event)"
+          :timed="true"
+          :id="current.id"
+          :tracks="mappedTracks"
+        >
+          <div class="flex z-10 items-end" style="padding: 20px 0px 20px 0px">
+            <div class="button-circle-play" style="margin: 6px 6px 0px 0px">
+              <v-icon style="font-size: 40px">mdi-play</v-icon>
+            </div>
+          </div>
+        </TrackTable>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-
-import TrackTable from "../components/TracksTable.vue";
+import TrackTable from "../components/TrackList.vue";
 import Loader from "../components/Loader.vue";
-
+import LikesLogo from "../assets/likes.png";
 import { mapGetters } from "vuex";
 export default {
   computed: {
     ...mapGetters(["albums", "user"]),
     current() {
-      return this.albums.find((a) => a.id === this.$route.params.id);
+      return this.albums[0];
+    },
+    mappedTracks() {
+      return this.current.tracks.map((t) => ({
+        ...t,
+        desc: this.current.title,
+        albumImg: this.current.src,
+      }));
     },
     trackShow() {
       return this.trackList.slice(0, 4);
+    },
+    tracksCountLabel() {
+      return this.len === 1 ? "трек" : this.len <= 2 ? "трека" : "треків";
+    },
+    len() {
+      return this.current.tracks.length;
     },
   },
   components: { Loader, TrackTable },
   data: () => ({
     loading: true,
-    backColor: "",
+    LikesLogo,
   }),
   methods: {
     fmtMSS(s) {
       return ((s - (s %= 60)) / 60 + (9 < s ? ":" : ":0") + s).split(".")[0];
     },
   },
-  async mounted() {
-    await this.changeStyle();
-  },
-  watch: {
-    "current.id"() {
-      this.changeStyle();
-    },
+  mounted() {
+    this.$emit("changeStyle", "rgb(80, 56, 160)");
+    this.$emit("changeContent", "Любимі пісні");
+    this.loading = false;
   },
 };
 </script>
 
 <style lang="scss" scoped>
+.button-circle-play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+
+  background-color: #1db954 !important;
+  color: #fff;
+
+  border-radius: 50%;
+  font-size: 28px;
+}
+.m-0 {
+  margin: 0;
+}
+.text-tracks {
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 16px;
+  text-transform: none;
+}
+.author-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: normal;
+  line-height: 16px;
+  text-transform: none;
+
+  color: #fff;
+  text-decoration: none;
+}
+.fav-title-big {
+  padding: 0.08em 0px;
+  visibility: visible;
+  width: 100%;
+
+  font-size: 96px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 96px;
+  text-transform: none;
+}
 .detail-text {
   font-weight: 700;
   font-size: 12px;
@@ -106,7 +183,7 @@ export default {
 .lay3 {
   background: linear-gradient(
     180deg,
-    rgba(0, 0, 0, 0.673739837731968) 2%,
+    rgba(0, 0, 0, 0.573739837731968) 2%,
     rgba(18, 18, 18, 1) 100%
   );
   height: 232px;
@@ -222,7 +299,11 @@ export default {
   text-transform: none;
 }
 .dots-w {
-  padding: 10px 10px 24px 36px;
+  display: flex;
+  padding: 0 !important;
+  align-items: center;
+  justify-content: center;
+
   font-size: 38px;
   position: relative;
 }

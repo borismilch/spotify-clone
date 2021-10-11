@@ -64,7 +64,11 @@
             bottom-4
           "
         >
-          <v-icon>{{ (song ? rec.id === song.id && song.play : false) ? "mdi-pause" : "mdi-play" }}</v-icon>
+          <v-icon>{{
+            (song ? rec.id === song.id && song.play : false)
+              ? "mdi-pause"
+              : "mdi-play"
+          }}</v-icon>
         </button>
       </div>
     </div>
@@ -86,7 +90,7 @@ export default {
     screenWidth: window.innerWidth,
   }),
   computed: {
-    ...mapGetters(["albums", "song", 'controller']),
+    ...mapGetters(["albums", "song", "controller"]),
     itemsToShow() {
       return this.albums.filter((i, idx) => idx < this.numToShow);
     },
@@ -114,15 +118,14 @@ export default {
       console.log(this.screenWidth);
     },
     async setActiveAlbum(idx) {
-      if (this.song? this.song.id !== this.albums[idx].id : true) {
+      if (this.song ? this.song.id !== this.albums[idx].id : true) {
         await this.$store.dispatch("getFirstSong", [
           this.itemsToShow[idx].id,
           0,
         ]);
-      }
-      else if (this.song? this.song.id === this.albums[idx].id : false) {
-        console.log('sss')
-        this.$store.commit('changeController', !this.controller)
+      } else if (this.song ? this.song.id === this.albums[idx].id : false) {
+        console.log("sss");
+        this.$store.commit("changeController", !this.controller);
       }
     },
   },

@@ -4,25 +4,25 @@
     <ul style="z-index: 10">
       <li
         class="flex justify-beetween relative py-2 px-2 items-center lich"
-        :class="{'li-active': li.ref === song.ref }"
+        :class="{ 'li-active': song ? li.ref === song.ref : false }"
         v-for="(li, idx) in this.$route.meta.player ? tracks : trackShow"
         :key="idx"
         @click="setActiveAlbum(li.ref)"
       >
-
-        <v-icon 
-          class="only-hover none"
-          @click="changeActivity(li.ref)"
-        >
-          {{ (song ? li.ref === song.ref && song.play : false)  ? 'mdi-pause' : 'mdi-play' }}
-          
+        <v-icon class="only-hover none" @click="changeActivity(li.ref)">
+          {{
+            (song ? li.ref === song.ref && song.play : false)
+              ? "mdi-pause"
+              : "mdi-play"
+          }}
         </v-icon>
-        <span class="w-6 hbdd normal-text index text-center">{{ idx + 1 }}</span>
+        <span class="w-6 hbdd normal-text index text-center">{{
+          idx + 1
+        }}</span>
         <div style="width: 40px" class="mx-4">
           <v-img
             class="h-10 rounded-sm"
-            style="width: 40px; height: 40px !important; object-fit:cover"
-            
+            style="width: 40px; height: 40px !important; object-fit: cover"
             :src="li.albumImg"
           ></v-img>
         </div>
@@ -40,9 +40,17 @@
           >
         </div>
         <span class="normal-font flex-1">{{ li.desc }}</span>
+        <div style="width: 300px" v-if="timed" class="normal-font flex-1">
+          {{ new Date() | date }}
+        </div>
         <div class="flex items-center gap-4">
           <v-icon
-            @click="li.liked = !li.liked"
+            @click.stop="
+              li.liked = !li.liked;
+              li.liked
+                ? like([li.parent, li.ref])
+                : dislike([li.parent, li.ref]);
+            "
             :style="{ color: li.liked ? '#1ed760' : '#a7a7a7' }"
             >{{ li.liked ? "mdi-heart" : "mdi-heart-outline" }}</v-icon
           >
@@ -55,61 +63,64 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import { fmtMSS } from '../utils/secs.func'
+import { mapGetters } from "vuex";
+import { fmtMSS } from "../utils/secs.func";
 import doom from "../assets/doom.jpg";
 export default {
   data: () => ({
     doom,
   }),
   computed: {
-    ...mapGetters(['song', 'albums']),
+    ...mapGetters(["song", "albums"]),
     trackShow() {
       return this.trackList.slice(0, 4);
     },
   },
-  methods: { 
+  methods: {
     fmtMSS,
-     async setActiveAlbum(ref) {
+    async setActiveAlbum(ref) {
       const activeAlb = this.albums.find((a) => a.id === this.song.id);
-      let idx = activeAlb.tracks.findIndex(t => t.ref === ref)
-      if (
-        this.song
-          ? 
-            this.song.ref !== activeAlb.tracks[idx].ref
-          : true
-      ) {
+      let idx = activeAlb.tracks.findIndex((t) => t.ref === ref);
+      if (this.song ? this.song.ref !== activeAlb.tracks[idx].ref : true) {
         await this.$store.dispatch("getFirstSong", [activeAlb.id, idx]);
-        this.$store.commit('changePlay', true)
+        this.$store.commit("changePlay", true);
       }
     },
-    async changeActivity (ref) {
-      let idx = this.tracks.findIndex(t => t.ref === ref)
+    async changeActivity(ref) {
+      let idx = this.tracks.findIndex((t) => t.ref === ref);
       if (this.song.ref !== this.tracks[idx].ref) {
-        await this.setActiveAlbum(idx)
+        await this.setActiveAlbum(idx);
+      } else {
+        this.play = !this.play;
+        this.$store.commit("changeController", this.play);
       }
-      else {
-        this.play = !this.play
-        this.$store.commit('changeController',this.play)
-      }
-    } 
+    },
+    async like(params) {
+      this.$emit("pageMessage", "USER_LIKED");
+      await this.$store.dispatch("like", params);
+    },
+    async dislike(params) {
+      this.$emit("pageMessage", "USER_DISLIKED");
+      await this.$store.dispatch("dislike", params);
+    },
   },
   props: {
     tracks: Array,
-  }
+    timed: Boolean,
+  },
 };
 </script>
 
 <style lang="scss" scoped>
 .li-active {
-
   .only-hover {
     display: block !important;
   }
   .index {
     display: none !important;
   }
-  .normal-font-lg, .hbdd {
+  .normal-font-lg,
+  .hbdd {
     color: #1ed760;
   }
   .ubuntu {
@@ -156,7 +167,6 @@ export default {
   opacity: 0;
 }
 .lich {
-  
   cursor: pointer;
   &:hover {
     background: hsla(0, 0%, 100%, 0.07);

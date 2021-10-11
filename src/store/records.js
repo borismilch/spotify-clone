@@ -29,16 +29,24 @@ export default {
     },
     async filterAlbums({ dispatch }, albums) {
       const uid = await dispatch("getUid");
+      const likes = await dispatch("getLikes");
+      console.log(Object.values(likes));
       return Object.keys(albums).map((key) => ({
         ...albums[key],
         author: albums[key].creator === uid,
         id: key,
-        tracks: albums[key].tracks.map((t) => ({ ...t, active: false })),
+        tracks: albums[key].tracks.map((t) => ({
+          ...t,
+          parent: key,
+          liked: !!Object.values(likes).find(
+            (l) => l.ref === t.ref && l.id === key
+          ),
+        })),
       }));
     },
   },
   getters: {
     albums: (s) => s.albums,
-
+    likesVal: (s) => s.likes,
   },
 };
