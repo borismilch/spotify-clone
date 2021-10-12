@@ -2,7 +2,11 @@ import firebase from "firebase/compat/app";
 
 export default {
   state: { likes: [] },
-  mutations: {},
+  mutations: {
+    setLikes(state, likes) {
+      state.likes = likes
+    }
+  },
   actions: {
     async like({ dispatch }, params) {
       const uid = await dispatch("getUid");
@@ -10,7 +14,7 @@ export default {
       await firebase
         .database()
         .ref(`/users/${uid}/likes`)
-        .push({ id, ref, date: new Date() });
+        .push({ id, ref, date: new Date().toLocaleDateString() });
       await dispatch("fetchAlbums");
     },
     async dislike({ dispatch }, params) {
@@ -25,13 +29,16 @@ export default {
       await firebase.database().ref(`/users/${uid}/likes/${key}`).remove();
       await dispatch("fetchAlbums");
     },
-    async getLikes({ dispatch }) {
+    async getLikes({ dispatch, commit }) {
       const uid = await dispatch("getUid");
       const likes = (
         await firebase.database().ref(`/users/${uid}/likes`).once("value")
       ).val();
+      commit('setLikes', likes ? Object.values(likes) : [])
       return likes ? likes : [];
     },
   },
-  getters: {},
+  getters: {
+    likes: s => s.likes
+  },
 };

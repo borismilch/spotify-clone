@@ -113,6 +113,7 @@ export default {
 
 <style lang="scss" scoped>
 .li-active {
+  background: hsla(0, 0%, 100%, 0.1);
   .only-hover {
     display: block !important;
   }

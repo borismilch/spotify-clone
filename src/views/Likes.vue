@@ -31,7 +31,7 @@
               <span class="author-title">{{ user.name }}</span>
               <li class="text-tracks ml-2">
                 <span style="position: relative; left: -10px"
-                  >{{ current.tracks.length }} {{ tracksCountLabel }}</span
+                  >{{ trueLikedTracks.length }} {{ tracksCountLabel }}</span
                 >
               </li>
             </div>
@@ -46,14 +46,16 @@
 
       <div class="z-10" style="padding: 0px 32px 0px 32px">
         <TrackTable
+        v-if="trueLikedTracks.length"
           @pageMessage="$emit('pageMessage', $event)"
           :timed="true"
-          :id="current.id"
-          :tracks="mappedTracks"
+          :tracks="trueLikedTracks"
         >
           <div class="flex z-10 items-end" style="padding: 20px 0px 20px 0px">
             <div class="button-circle-play" style="margin: 6px 6px 0px 0px">
-              <v-icon style="font-size: 40px">mdi-play</v-icon>
+              <v-icon style="font-size: 40px">
+               {{song? (!!(trueLikedTracks.find(t => t.parent === song.id && t.ref === song.ref) && song.play)) : false ?  'mdi-pause' : 'mdi-play'}}
+              </v-icon>
             </div>
           </div>
         </TrackTable>
@@ -69,7 +71,7 @@ import LikesLogo from "../assets/likes.png";
 import { mapGetters } from "vuex";
 export default {
   computed: {
-    ...mapGetters(["albums", "user"]),
+    ...mapGetters(["albums", "user", 'likes']),
     current() {
       return this.albums[0];
     },
@@ -79,6 +81,21 @@ export default {
         desc: this.current.title,
         albumImg: this.current.src,
       }));
+    },
+    likedTracks() {
+      return this.likes.map(l => { 
+       return this.albums.filter(a => a.id === l.id).map(a => {
+         return a.tracks.filter(t => t.parent === l.id && t.ref === l.ref).map(t => ({
+            ...t,
+            desc: a.title,
+            albumImg: a.src,
+          }))
+        })
+        
+      });
+    },
+    trueLikedTracks() {
+      return this.likedTracks.length? this.likedTracks.map(t => t[0][0]) : []
     },
     trackShow() {
       return this.trackList.slice(0, 4);
@@ -122,6 +139,12 @@ export default {
   border-radius: 50%;
   font-size: 28px;
 }
+
+// {{
+//                 (song ? song.id === $route.params.id && song.play : false)
+//                 ? "mdi-pause"
+//                 : "mdi-play"
+//               }}
 .m-0 {
   margin: 0;
 }
