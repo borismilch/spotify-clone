@@ -1,13 +1,14 @@
 <template>
   <div class="flex flex-col">
     <slot></slot>
-    <ul style="z-index: 10">
+    <ul style="z-index: 10" v-if="tracks.length">
       <li
+       
         class="flex justify-beetween relative py-2 px-2 items-center lich"
         :class="{ 'li-active': song ? li.ref === song.ref : false }"
         v-for="(li, idx) in this.$route.meta.player ? tracks : trackShow"
         :key="idx"
-        @click="setActiveAlbum(li.ref)"
+        @click="setActiveAlbum(li.ref, li.parent)"
       >
         <v-icon class="only-hover none" @click="changeActivity(li.ref)">
           {{
@@ -26,7 +27,7 @@
             :src="li.albumImg"
           ></v-img>
         </div>
-        <div class="flex flex-col" style="width: 50%">
+        <div class="flex flex-col flex-1">
           <span class="normal-font-lg mb-2">{{ li.title }}</span>
           <span
             class="
@@ -36,14 +37,24 @@
               cursor-pointer
               opacity-90
             "
+            style="color: #b3b3b3"
             >{{ li.author }}</span
           >
         </div>
-        <span class="normal-font flex-1">{{ li.desc }}</span>
-        <div style="width: 300px" v-if="timed" class="normal-font flex-1">
+        <span class="normal-font" style="color: #b3b3b3; flex: 0.3 0 auto">{{
+          li.desc
+        }}</span>
+        <div
+          v-if="timed"
+          style="color: #b3b3b3; flex: 0.3 0 auto"
+          class="normal-font"
+        >
           {{ new Date() | date }}
         </div>
-        <div class="flex items-center gap-4">
+        <button class="add-button ml-10" @click.stop="$emit('addTrack', [li.ref, li.parent, li.album,li.duration])" v-if="buttons">
+          <span>Додати</span>
+        </button>
+        <div class="flex items-center gap-4 ml-10" v-else>
           <v-icon
             @click.stop="
               li.liked = !li.liked;
@@ -52,6 +63,7 @@
                 : dislike([li.parent, li.ref]);
             "
             :style="{ color: li.liked ? '#1ed760' : '#a7a7a7' }"
+            style="font-size: 18px"
             >{{ li.liked ? "mdi-heart" : "mdi-heart-outline" }}</v-icon
           >
           <span class="normal-font">{{ fmtMSS(li.duration) }}</span>
@@ -59,6 +71,7 @@
         </div>
       </li>
     </ul>
+    <slot v-else name="empty"></slot>
   </div>
 </template>
 
@@ -73,13 +86,14 @@ export default {
   computed: {
     ...mapGetters(["song", "albums"]),
     trackShow() {
-      return this.trackList.slice(0, 4);
+      return this.tracks.slice(4);
     },
   },
+
   methods: {
     fmtMSS,
-    async setActiveAlbum(ref) {
-      const activeAlb = this.albums.find((a) => a.id === this.song.id);
+    async setActiveAlbum(ref, id) {
+      const activeAlb = this.albums.find((a) => a.id === id);
       let idx = activeAlb.tracks.findIndex((t) => t.ref === ref);
       if (this.song ? this.song.ref !== activeAlb.tracks[idx].ref : true) {
         await this.$store.dispatch("getFirstSong", [activeAlb.id, idx]);
@@ -105,6 +119,7 @@ export default {
     },
   },
   props: {
+    buttons: Boolean,
     tracks: Array,
     timed: Boolean,
   },
@@ -112,10 +127,42 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.add-button {
+  background-color: transparent;
+
+  border: 1px solid #3b3838;
+  border-radius: 500px;;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.76px;
+  line-height: 18px;
+  padding: 8px 34px;
+  text-align: center;
+  text-transform: uppercase;
+  transition: all 33ms cubic-bezier(.3,0,0,1);
+  white-space: nowrap;
+  will-change: transform;
+  color: #b3b3b3;
+  &:hover {
+    border: 2px solid #b3b3b3;
+    color: #fff;
+  }
+  & span {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    line-height: 16px;
+    text-transform: uppercase;
+  }
+}
 .li-active {
   background: hsla(0, 0%, 100%, 0.1);
   .only-hover {
     display: block !important;
+    color: #1ed760;
   }
   .index {
     display: none !important;

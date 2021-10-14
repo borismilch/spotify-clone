@@ -1,6 +1,6 @@
 <template>
   <div
-    class="w-64 fixed overflow-hidden bg-black h-full flex flex-col flex-grow-0"
+    class="w-64 z-50 fixed overflow-hidden bg-black h-full flex flex-col flex-grow-0"
   >
     <router-link to="/" tag="div">
       <img
@@ -56,10 +56,10 @@
           >
             Playlists
           </h1>
-          <router-link
+          <button
+            @click="createPlaylist"
             exact
             active-class="active2"
-            to="/create"
             class="flex pr-3 py-2 hover-effect items-center justify-start w-40"
           >
             <div
@@ -83,13 +83,13 @@
             <span class="text-white ml-2 w-24 flex-1 dots"
               >Створити плейліст</span
             >
-          </router-link>
+          </button>
 
           <router-link
             to="/likes"
             exact
             active-class="active2"
-            class="flex pr-3 py-2 items-center justify-start w-40"
+            class="flex pr-3 py-2 items-center justify-start w-40 block"
           >
             <div
               class="
@@ -112,13 +112,16 @@
         </div>
         <div class="mx-5">
           <div
-            class="w-full h-10 overflow-y-scroll duration-200"
+            class="w-full h-10 overflow-y-scroll duration-200 flex flex-col"
             :class="{ 'h-75': !imageShown }"
           >
-            <p
-              v-for="(alb, idx) in albums"
-              :key="alb.name + idx"
-              style="font-size: 14px"
+            <router-link
+              :to="'/create/' + p.id"
+              exact
+              active-class="text-sp-green"
+              v-for="p in playlistsTitles"
+              :key="p.id"
+              style="font-size: 14px; color: #b3b3b3"
               class="
                 cursor-pointer
                 text-sp-ligntest
@@ -127,8 +130,8 @@
                 py-1
               "
             >
-              {{ alb.name }}
-            </p>
+              {{ p.title }}
+            </router-link>
           </div>
         </div>
       </div>
@@ -235,28 +238,33 @@ export default {
         to: "/lib",
       },
     ],
-    albums: [
-      { name: "Salosalo" },
-      { name: "Salosalo" },
-      { name: "Salosalo" },
-      { name: "Salosalo" },
-      { name: "Salosalo" },
-      { name: "Salosalo" },
-      { name: "Salosalo" },
-    ],
   }),
   methods: {
     emitImage(e) {
       this.$emit("emitImage", e);
     },
+    async createPlaylist() {
+      this.$emit("pageMessage", "PLAYLIST_CREATED");
+      await this.$store.dispatch("addPlaylist");
+
+      this.$router.push(
+        "/create/" + this.playlists[this.playlists.length - 1].id
+      );
+    },
   },
   computed: {
-    ...mapGetters(["song"]),
+    ...mapGetters(["song", "playlists"]),
+    playlistsTitles() {
+      return this.playlists.map((p) => ({ id: p.id, title: p.title }));
+    },
   },
 };
 </script>
 
 <style lang="scss">
+.text-sp-green {
+  color: #1ed760 !important;
+}
 .special-gradient {
   background: linear-gradient(135deg, #450af5, #c4efd9) !important;
 }

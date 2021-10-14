@@ -56,12 +56,11 @@
       </div>
       <v-icon
         v-if="song"
-        class="text-sp-green icon-hover mx-3 text-lg cursor-pointer"  @click.stop="
+        class="text-sp-green icon-hover mx-3 text-lg cursor-pointer"
+        @click.stop="
           song.liked = !song.liked;
-          song.liked
-            ? like([song.id, song.ref])
-            : dislike([song.id, song.ref]);
-            "
+          song.liked ? like([song.id, song.ref]) : dislike([song.id, song.ref]);
+        "
         :style="{ color: song.liked ? '#1ed760' : '#a7a7a7' }"
         >{{ song.liked ? "mdi-heart" : "mdi-heart-outline" }}</v-icon
       >
@@ -154,7 +153,7 @@
 </template>
 
 <script>
-import doom from "../assets/music.jpg";
+import doom from "../assets/defaultImg.png";
 import { mapGetters } from "vuex";
 export default {
   props: {
@@ -246,7 +245,7 @@ export default {
     musicPlay() {
       if (this.song) {
         this.play = !this.play;
-        if (this.play) { 
+        if (this.play) {
           this.track.play();
         } else {
           this.track.pause();

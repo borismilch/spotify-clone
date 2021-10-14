@@ -23,9 +23,9 @@ const routes = [
     component: () => import("../views/Register.vue"),
   },
   {
-    path: "/create",
+    path: "/create/:id",
     name: "Create",
-    meta: { auth: true },
+    meta: { auth: true, player: true },
     component: () => import("../views/Create.vue"),
   },
   {
@@ -49,7 +49,7 @@ const routes = [
   {
     path: "/search",
     name: "Search",
-    meta: { auth: true },
+    meta: { auth: true, searchField: true, player: true },
     component: () => import("../views/Search.vue"),
   },
   {
@@ -63,6 +63,12 @@ const routes = [
     name: "PlayList",
     meta: { auth: true, player: true },
     component: () => import("../views/PlayList.vue"),
+  },
+  {
+    path: "/genre/:genre",
+    name: "Genre",
+    meta: { auth: true },
+    component: () => import("../views/Genre.vue"),
   },
 ];
 

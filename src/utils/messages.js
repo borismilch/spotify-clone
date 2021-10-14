@@ -8,4 +8,17 @@ export default {
   NO_SONG_SELECTED: { type: "error", message: "Ви не вибрали пісню" },
   USER_LIKED: { type: "success", message: "Додано у вподобайки" },
   USER_DISLIKED: { type: "success", message: "Видалено з вподобайок" },
+  PLAYLIST_CREATED: { type: "info", message: "Ви успішно створили плейліст" },
+  PLAYLIST_CHANGED: {
+    type: "success",
+    message: "Ви успішно відредагували плейліст",
+  },
+  PLAYLIST_DELETED: {
+    type: "success",
+    message: "Плейліст видалено",
+  },
+  ADDED_TO_PLAYLIST: {
+    type: 'info',
+    message: "Трек добавлено"
+  }
 };

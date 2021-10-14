@@ -38,6 +38,7 @@ export default {
         tracks: albums[key].tracks.map((t) => ({
           ...t,
           parent: key,
+          album: albums[key].title,
           liked: !!Object.values(likes).find(
             (l) => l.ref === t.ref && l.id === key
           ),

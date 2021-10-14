@@ -31,6 +31,7 @@
       </div>
       <div class="z-10" style="padding: 0px 32px 0px 32px">
         <TrackTable
+          :deleteActivity="true"
           @pageMessage="$emit('pageMessage', $event)"
           :id="current.id"
           :tracks="current.tracks"

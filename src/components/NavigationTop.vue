@@ -2,8 +2,9 @@
   <div
     id="navBar"
     ref="navBar"
+    style="z-index:1000"
     class="
-      z-50
+      
       duration-200
       fixed
       w-full
@@ -61,6 +62,17 @@
         </button>
       </div>
       <Fade>
+        <v-col v-if="$route.meta.searchField" style="padding: 0px" class="flex mt-7 flex-col items-center justify-center" cols="12">
+          <v-text-field
+            filled
+            @input="$emit('searching', $event)"
+            rounded
+            dense
+            clearable
+            prepend-inner-icon="mdi-magnify"
+            placeholder="Пошук треків"
+          ></v-text-field>
+        </v-col>
         <div
           v-if="scroll > 60 && this.$route.meta.player"
           class="flex gap-3 items-center"

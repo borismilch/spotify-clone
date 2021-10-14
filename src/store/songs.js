@@ -4,6 +4,7 @@ export default {
   state: {
     currentSong: null,
     controller: false,
+    playListOn: []
   },
   mutations: {
     setSong(state, song) {
@@ -15,10 +16,13 @@ export default {
     changeController(state, val) {
       state.controller = val;
     },
+    setPlaylistSongs(state, songs) {
+      state.playListOn = songs
+    }
   },
   actions: {
     async getFirstSong({ getters, commit }, params) {
-      let [id, idx = 0] = params;
+      let [id, idx = 0, plId='', fromPl=false ] = params;
       const alb = getters.albums.find((alb) => alb.id === id);
       if (idx === alb.tracks.length) {
         idx = 0;
@@ -36,12 +40,15 @@ export default {
         ...alb.tracks[idx],
         id: alb.id,
         url,
+        fromPl,
+        plId,
         play: true,
         desc: alb.title,
       };
 
       commit("setSong", song);
     },
+    
     async nextSong({ getters, dispatch }) {
       const currentAlb = await dispatch("getCurrentAlb");
       const currentSongIdx = currentAlb.tracks.findIndex(
@@ -63,6 +70,7 @@ export default {
     },
   },
   getters: {
+    playListOn: s => s.playListOn,
     song: (s) => s.currentSong,
     controller: (s) => s.controller,
   },

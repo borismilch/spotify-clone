@@ -14,7 +14,10 @@
               alt=""
             />
           </div>
-          <div class="user-info flex flex-col mx-6 justify-end mb-4">
+          <div
+            class="user-info flex flex-col mx-6 justify-end mb-4"
+            style="margin-top: 20px"
+          >
             <span class="detail-text">Плейліст</span>
             <h1 class="fav-title-big font-extrabold">Улюблені треки</h1>
             <div class="flex items-center">
@@ -38,76 +41,110 @@
           </div>
         </div>
       </div>
-      <div
-        class="lay2 z-10 absolute"
-        style="background-color: rgb(80, 56, 160)"
-      ></div>
-      <div class="lay3 z-10 absolute"></div>
+      <div>
+        <div
+          class="lay2 z-10 absolute"
+          style="background-color: rgb(80, 56, 160)"
+        ></div>
+        <div class="lay3 z-10 absolute"></div>
 
-      <div class="z-10" style="padding: 0px 32px 0px 32px">
-        <TrackTable
-        v-if="trueLikedTracks.length"
-          @pageMessage="$emit('pageMessage', $event)"
-          :timed="true"
-          :tracks="trueLikedTracks"
-        >
-          <div class="flex z-10 items-end" style="padding: 20px 0px 20px 0px">
-            <div class="button-circle-play" style="margin: 6px 6px 0px 0px">
-              <v-icon style="font-size: 40px">
-               {{song? (!!(trueLikedTracks.find(t => t.parent === song.id && t.ref === song.ref) && song.play)) : false ?  'mdi-pause' : 'mdi-play'}}
-              </v-icon>
+        <div class="z-10" style="padding: 0px 32px 0px 32px; positi">
+          <TrackTable
+            v-if="likedTracks.length"
+            @pageMessage="$emit('pageMessage', $event)"
+            :timed="true"
+            :tracks="trueLikedTracks"
+          >
+            <div class="flex flex-col">
+              <div
+                class="flex z-10 items-end"
+                style="padding: 20px 0px 86px 0px"
+              >
+                <div
+                  class="button-circle-play"
+                  style="margin: 6px 6px 0px 0px; position: absolute"
+                >
+                  <v-icon style="font-size: 40px" @click="setActiveAlbum">
+                    {{
+                      (
+                        song
+                          ? !!(
+                              trueLikedTracks.find(
+                                (t) =>
+                                  t.parent === song.id && t.ref === song.ref
+                              ) && song.play
+                            )
+                          : false
+                      )
+                        ? "mdi-pause"
+                        : "mdi-play"
+                    }}
+                  </v-icon>
+                </div>
+              </div>
+              <ListHeader :timed="true" />
             </div>
-          </div>
-        </TrackTable>
+          </TrackTable>
+          <p
+            style="
+              z-index: 20 !important;
+              font-size: 20px;
+              font-weight: bold;
+              margin: 30px 0px 0px 0px !important;
+            "
+            v-else
+            class="text-lg absolute"
+          >
+            Вподобайки відсутні,
+            <router-link
+              to="/"
+              style="color: #1ed760 !important"
+              class="under"
+              tag="a"
+              >Перейти на головну</router-link
+            >
+          </p>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import ListHeader from "../components/util/ListHeader.vue";
 import TrackTable from "../components/TrackList.vue";
 import Loader from "../components/Loader.vue";
 import LikesLogo from "../assets/likes.png";
 import { mapGetters } from "vuex";
 export default {
   computed: {
-    ...mapGetters(["albums", "user", 'likes']),
-    current() {
-      return this.albums[0];
-    },
-    mappedTracks() {
-      return this.current.tracks.map((t) => ({
-        ...t,
-        desc: this.current.title,
-        albumImg: this.current.src,
-      }));
-    },
+    ...mapGetters(["albums", "user", "likes", "song", "controller"]),
+
     likedTracks() {
-      return this.likes.map(l => { 
-       return this.albums.filter(a => a.id === l.id).map(a => {
-         return a.tracks.filter(t => t.parent === l.id && t.ref === l.ref).map(t => ({
-            ...t,
-            desc: a.title,
-            albumImg: a.src,
-          }))
-        })
-        
+      return this.likes.map((l) => {
+        return this.albums
+          .filter((a) => a.id === l.id)
+          .map((a) => {
+            return a.tracks
+              .filter((t) => t.parent === l.id && t.ref === l.ref)
+              .map((t) => ({
+                ...t,
+                desc: a.title,
+                albumImg: a.src,
+              }));
+          });
       });
     },
     trueLikedTracks() {
-      return this.likedTracks.length? this.likedTracks.map(t => t[0][0]) : []
-    },
-    trackShow() {
-      return this.trackList.slice(0, 4);
+      return this.likedTracks.length
+        ? this.likedTracks.map((t) => t[0][0])
+        : [];
     },
     tracksCountLabel() {
       return this.len === 1 ? "трек" : this.len <= 2 ? "трека" : "треків";
     },
-    len() {
-      return this.current.tracks.length;
-    },
   },
-  components: { Loader, TrackTable },
+  components: { Loader, TrackTable, ListHeader },
   data: () => ({
     loading: true,
     LikesLogo,
@@ -115,6 +152,23 @@ export default {
   methods: {
     fmtMSS(s) {
       return ((s - (s %= 60)) / 60 + (9 < s ? ":" : ":0") + s).split(".")[0];
+    },
+    async setActiveAlbum() {
+      const isAc = this.song
+        ? !!this.trueLikedTracks.find(
+            (t) => t.ref === this.song.ref && t.parent === this.song.id
+          )
+        : false;
+      console.log(isAc);
+      if (!isAc) {
+        await this.$store.dispatch("getFirstSong", [
+          this.trueLikedTracks[0].parent,
+          0,
+        ]);
+      }
+      if (isAc) {
+        this.$store.commit("changeController", !this.controller);
+      }
     },
   },
   mounted() {
@@ -126,6 +180,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.under {
+  &:hover {
+    text-decoration: underline !important;
+  }
+}
 .button-circle-play {
   display: flex;
   align-items: center;

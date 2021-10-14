@@ -1,12 +1,21 @@
 <template>
   <div class="bg-sp-dark bg-gradient-to-b h-screen pb-20">
     <div class="flex" style="height: 88vh">
-      <HeadNav @emitImage="emitImage($event)" :imageShown="imageShown" />
+      <HeadNav
+        @emitImage="emitImage($event)"
+        @pageMessage="pageResponse($event)"
+        :imageShown="imageShown"
+      />
 
       <div class="p-layout reletive w-full h-full">
-        <NavigationTop :bgCol="navColor" :navContent="navContent" />
+        <NavigationTop 
+        :bgCol="navColor" 
+        :navContent="navContent" 
+        @searching ="searchInCategories = $event" />
+
         <div class="pb-32">
           <router-view
+            :searchInCategories="searchInCategories"
             @changeContent="navContent = $event"
             @changeStyle="navColor = $event"
             @pageMessage="pageResponse($event)"
@@ -32,6 +41,7 @@ export default {
     imageShown: false,
     navColor: "#121212",
     navContent: "",
+    searchInCategories: ''
   }),
   components: {
     HeadNav,

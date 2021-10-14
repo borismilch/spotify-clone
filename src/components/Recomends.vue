@@ -1,6 +1,6 @@
 <template>
   <div class="relative">
-    <div class="px-6 py-3 flex justify-between items-center mr-5">
+    <div class="px-6 flex justify-between items-center mr-5">
       <h1 class="text-2xl font-bold text-white tracking-wider hover:underline">
         {{ title }}
       </h1>
@@ -19,6 +19,7 @@
     </div>
     <div class="flex w-full flex-nowrap gap-6">
       <div
+        
         v-for="(rec, idx) in itemsToShow"
         class="relative flex-1 bhover"
         :key="rec.src.slice(20) + idx"
@@ -31,17 +32,18 @@
         >
           <div class="bg-sp-lignt w-full h-auto px-4 py-4 relative">
             <img
-              style="object-fit: cover; min-height: 190px"
+              style="object-fit: cover; height: 152px; max-height:200px"
               :src="rec.src"
               class="h-auto w-full shad mb-2"
               :class="{ 'rounded-full': isAuthors }"
               alt=""
             />
-            <h1 class="text-sm mt-4 font-semibold text-white tracking-wider">
+            <h1 style="text-overflow:ellipsis" class="text-sm mt-4 font-semibold text-white ">
               {{ rec.title }}
             </h1>
-            <h2 class="text-xs text-sp-ligntest tracking-wider">
+            <h2 style="text-overflow:ellipsis; white-space: wrap; overflow:hidden; width: 100px" class="text-xs text-sp-ligntest my-2">
               {{ rec.artist }}
+              ccccscokcokcoooooooooooooo
             </h2>
           </div>
         </router-link>
@@ -92,14 +94,14 @@ export default {
   computed: {
     ...mapGetters(["albums", "song", "controller"]),
     itemsToShow() {
-      return this.albums.filter((i, idx) => idx < this.numToShow);
+      return this.template.filter((i, idx) => idx < this.numToShow);
     },
     numToShow() {
-      if (this.screenWidth >= 1540) return 6;
-      else if (this.screenWidth >= 1240) return 5;
-      else if (this.screenWidth >= 1040) return 4;
-      else if (this.screenWidth >= 840) return 3;
-      else if (this.screenWidth >= 640) return 2;
+      if (this.screenWidth >= 1340) return 6;
+      else if (this.screenWidth >= 1140) return 5;
+      else if (this.screenWidth >= 870) return 4;
+      else if (this.screenWidth >= 740) return 3;
+      else if (this.screenWidth >= 540) return 2;
       else if (this.screenWidth >= 440) return 1;
       else return 0;
     },
@@ -115,7 +117,6 @@ export default {
   methods: {
     setSize() {
       this.screenWidth = window.innerWidth;
-      console.log(this.screenWidth);
     },
     async setActiveAlbum(idx) {
       if (this.song ? this.song.id !== this.albums[idx].id : true) {
@@ -123,8 +124,8 @@ export default {
           this.itemsToShow[idx].id,
           0,
         ]);
+        this.$store.commit('setPlaylistSongs', [])
       } else if (this.song ? this.song.id === this.albums[idx].id : false) {
-        console.log("sss");
         this.$store.commit("changeController", !this.controller);
       }
     },
@@ -159,7 +160,7 @@ export default {
     & button {
       cursor: pointer;
       opacity: 1 !important;
-      transform: translateY(-80px) !important;
+      transform: translateY(-100px) !important;
     }
   }
 }

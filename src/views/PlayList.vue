@@ -13,11 +13,11 @@
 
         <div v-if="slicedTracks.length">
           <div>
-            <h2 class="que-subtitle">Далі по списку:</h2>
+            <h2 class="que-subtitle">Далі по списку</h2>
           </div>
           <PlayList
             @pageMessage="$emit('pageMessage', $event)"
-            :tracks="slicedTracks"
+            :tracks="playListOn.length ? slicedTracksP : slicedTracks"
           >
             <div></div>
           </PlayList>
@@ -37,15 +37,23 @@ export default {
     loading: true,
   }),
   mounted() {
+    this.$emit("changeStyle", "#2a2a2a");
+    this.$emit("changeContent", "Очередь");
     this.loading = false;
   },
   computed: {
-    ...mapGetters(["song", "albums"]),
+    ...mapGetters(["song", "albums", "playlists", "playListOn"]),
     curAlb() {
       return this.albums.find((a) => a.id === this.song.id);
     },
     currentTracks() {
-      return this.song ? this.curAlb.tracks : [];
+      return  this.song ? this.curAlb.tracks : [];
+    },
+    playlistsTracks() {
+      return this.curAlb.tracks.map(t => {
+        const alb = this.albums.find(a => a.id === t.parent)
+        return {...t, albumImg: alb.src, desc: this.curAlb.title, }
+      })
     },
     slicedTracks() {
       return this.song
@@ -55,19 +63,22 @@ export default {
             )
             .map((t) => ({
               ...t,
-              albumImg: this.curAlb.src,
+              albumImg: this.curAlb.src ?? this.curAlb.img,
               desc: this.curAlb.title,
               creator: this.curAlb.creator,
             }))
         : [];
     },
+    slicedTracksP() {
+      return this.playListOn ? this.playListOn.slice(this.playListOn.findIndex(t => t.ref === this.song.ref && t.parent === this.song.id) + 1) : []
+    }
   },
 };
 </script>
 
 <style lang="scss" scoped>
 section {
-  padding: 60px 30px 0px 30px;
+  padding: 60px 15px 0px 30px;
 }
 .mt-40 {
   margin-top: 40px;

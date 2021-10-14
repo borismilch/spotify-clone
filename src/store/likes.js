@@ -4,8 +4,8 @@ export default {
   state: { likes: [] },
   mutations: {
     setLikes(state, likes) {
-      state.likes = likes
-    }
+      state.likes = likes;
+    },
   },
   actions: {
     async like({ dispatch }, params) {
@@ -34,11 +34,11 @@ export default {
       const likes = (
         await firebase.database().ref(`/users/${uid}/likes`).once("value")
       ).val();
-      commit('setLikes', likes ? Object.values(likes) : [])
+      commit("setLikes", likes ? Object.values(likes) : []);
       return likes ? likes : [];
     },
   },
   getters: {
-    likes: s => s.likes
+    likes: (s) => s.likes,
   },
 };

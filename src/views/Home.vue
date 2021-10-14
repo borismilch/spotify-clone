@@ -51,7 +51,10 @@ export default {
   //   }, 300);
   // },
   mounted() {
-    setTimeout(() => (this.loading = false), 200);
+    setTimeout(async () => {
+      await this.$store.dispatch("fetchPlaylists");
+      this.loading = false;
+    }, 200);
   },
 };
 </script>

@@ -4,7 +4,7 @@
       style="background-color: #282828 !important"
       class="moda-header flex justify-between"
     >
-      <h1 class="list-title">Дані профіля</h1>
+      <h1 class="list-title">Дані Плейліста</h1>
       <v-btn text @click="$emit('onDialog', false)">
         <v-icon>mdi-close</v-icon>
       </v-btn>
@@ -18,7 +18,7 @@
             width="100%"
             height="100%"
             :src="img"
-            class="rounded-circle shadow-av"
+            class="shadow-av"
             alt=""
           />
           <v-overlay
@@ -26,7 +26,6 @@
             class="profile-overlay"
             :absolute="true"
             :value="true"
-            style="border-radius: 50%"
           >
             <div class="flex flex-col gap-14">
               <span class="font-normal hover:underline">Вибрати фото</span>
@@ -47,7 +46,17 @@
           class="modal-actions ml-3 flex flex-col justify-center flex-1"
           style="gap-16px"
         >
-          <input type="text" class="modal-input" name="" v-model="name" />
+          <input type="text" class="modal-input" name="" v-model="title" />
+          <v-textarea
+            background-color="rgba(255, 255, 255, 0.1)"
+            v-model="desc"
+            label="Description"
+            auto-grow
+            outlined
+            rows="3"
+            row-height="25"
+            shaped
+          ></v-textarea>
           <button
             class="modal-button"
             :disabled="changing"
@@ -73,33 +82,44 @@ import analyze from "rgbaster";
 import { mapGetters } from "vuex";
 export default {
   data: () => ({
-    name: "",
+    desc: "",
+    title: "",
     img: "",
     changing: false,
   }),
   computed: {
-    ...mapGetters(["user"]),
+    ...mapGetters(["user", "playlists"]),
+    current() {
+      return this.playlists.find((p) => p.id === this.$route.params.id);
+    },
   },
   props: {
     dialog: Boolean,
     defaultImg: String,
+  },
+  watch: {
+    "$route.params.id"() {
+      this.loadData();
+    },
   },
   methods: {
     analyze,
     async changeProfile() {
       this.changing = true;
       try {
-        await this.$store.dispatch("changeProfile", {
-          ...this.user,
-          avatar: this.img,
-          name: this.name,
-        });
+        const playlist = {
+          img: this.img,
+          title: this.title,
+          description: this.desc,
+        };
+        await this.$store.dispatch("updatePlaylist", [
+          this.current.id,
+          playlist,
+        ]);
 
         this.backColor = (await this.analyze(this.img))[0].color;
-        console.log(this.backColor);
-
         this.$emit("changeStyle", this.backColor);
-        this.$emit("pageMessage", "profile-changed");
+        this.$emit("pageMessage", "PLAYLIST_CHANGED");
         this.$emit("onDialog", false);
       } catch (e) {
         this.$emit("pageMessage", e.code);
@@ -117,16 +137,18 @@ export default {
       }, 500);
     },
     deleteFile() {
-      this.img =
-        this.defaultImg ||
-        "https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-portrait-176256935.jpg";
+      this.img = this.defaultImg;
+    },
+    async loadData() {
+      this.img = this.current.img;
+      this.title = this.current.title;
+      this.desc = this.current.description;
+      this.backColor = (await this.analyze(this.img))[0].color;
+      this.$emit("changeStyle", this.backColor);
     },
   },
   async mounted() {
-    this.img = this.user.avatar;
-    this.name = this.user.name;
-    this.backColor = (await this.analyze(this.img))[0].color;
-    this.$emit("changeStyle", this.backColor);
+    this.loadData();
   },
 };
 </script>
@@ -189,6 +211,8 @@ export default {
   cursor: pointer;
 }
 .user-avatar {
+  box-shadow: 5px 5px 30px #181818;
+  border-radius: 6px;
   z-index: 10;
   width: 180px;
   height: 180px;
