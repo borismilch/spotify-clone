@@ -14,7 +14,7 @@
           hover:underline
         "
       >
-        See more
+         See more
       </h2>
     </div>
     <div class="flex w-full flex-nowrap gap-6">
