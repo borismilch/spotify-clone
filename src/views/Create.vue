@@ -62,19 +62,26 @@
           }"
         ></div>
         <div class="lay3 z-10 absolute"></div>
-        <span @click.stop="dropdown = true" :style="{transform: !(currentTracks || []).length ? 'translate(0px)' : 'translate(80px, 20px)'}"  class="dots-padding z-20 absolute" style="z-index: 20 !important"
+        <span
+          @click.stop="dropdown = true"
+          :style="{
+            transform: !(currentTracks || []).length
+              ? 'translate(0px)'
+              : 'translate(80px, 20px)',
+          }"
+          class="dots-padding z-20 absolute"
+          style="z-index: 20 !important"
           >...</span
         >
         <CreateDropdown
           @remove="remove"
           @sendToList="sendToList"
           :dropdown="dropdown"
-         
           @dropdown="dropdown = false"
         />
         <div class="z-10" style="padding: 0px 32px 0px 32px">
           <TrackTable
-           v-if="currentTracks.length"
+            v-if="currentTracks.length"
             @pageMessage="$emit('pageMessage', $event)"
             :tracks="currentTracks"
           >
@@ -109,8 +116,14 @@
             </div>
           </TrackTable>
 
-          <section class="hint flex items-center justify-end" :style="{padding: 
-          (currentTracks || []).length ? '0px 0px 24px 0px' : '114px 0px 24px 0px'}">
+          <section
+            class="hint flex items-center justify-end"
+            :style="{
+              padding: (currentTracks || []).length
+                ? '0px 0px 24px 0px'
+                : '114px 0px 24px 0px',
+            }"
+          >
             <div class="w-full flex items-center" v-if="hint">
               <v-col
                 class="flex flex-col"
@@ -137,7 +150,10 @@
                 </v-col>
               </v-col>
               <span
-                @click="hint = false; searchQuery = ''"
+                @click="
+                  hint = false;
+                  searchQuery = '';
+                "
                 style="font-size: 40px; transform: translateX(-30px)"
                 class="cursor-pointer text-hover z-50"
               >
@@ -170,12 +186,12 @@
             @pageMessage="$emit('pageMessage', $event)"
             :tracks="searchingTracks"
           >
-           
             <div class="flex flex-col">
               <ListHeader :buttons="true" />
-              <span class="ml-2" v-if="!searchingTracks.length">По вашому запросу нічого не знайдено</span>
+              <span class="ml-2" v-if="!searchingTracks.length"
+                >По вашому запросу нічого не знайдено</span
+              >
             </div>
-            
           </TrackTable>
         </div>
       </div>
@@ -206,36 +222,38 @@ export default {
         ? this.playlists.findIndex((p) => p.id === this.$route.params.id) - 1
         : this.playlists.findIndex((p) => p.id === this.$route.params.id) + 1;
     },
-    currentTracks () {
-      return Object.keys(this.current.tracks || []).map(key => {
-        const t = this.current.tracks
-        const alb = this.albums.find(a => a.id === t[key].parent)
-        const track = this.allTracks.find(track => 
-        t[key].parent === track.parent 
-        &&
-        t[key].ref === track.ref
-        &&
-        t[key].album === track.album
-       )
-        return {...track, selfId: key, albumImg: alb.src, desc: alb.title}
-      })
-    },  
-    searchingTracks() {
-      return (
-        this.allTracks
-          .filter((t) => {
-           return  (this.normalize(t.title).includes(this.normalQuery) || this.normalize(t.album).includes(this.normalQuery) || this.normalize(t.author).includes(this.normalQuery)) && !this.currentTracks.find(ct=> ct.parent === t.parent && ct.ref === t.ref)
-          })
-          .map(t => {
-            const alb = this.albums.find(a => a.id === t.parent)
-            return { ...t, albumImg: alb.src, desc: alb.title }
-          })
-      );      
+    currentTracks() {
+      return Object.keys(this.current.tracks || []).map((key) => {
+        const t = this.current.tracks;
+        const alb = this.albums.find((a) => a.id === t[key].parent);
+        const track = this.allTracks.find(
+          (track) =>
+            t[key].parent === track.parent &&
+            t[key].ref === track.ref &&
+            t[key].album === track.album
+        );
+        return { ...track, selfId: key, albumImg: alb.src, desc: alb.title };
+      });
     },
-    allTracks () {
-      return this.albums
-      .map((a) => a.tracks)
-      .flat(1)
+    searchingTracks() {
+      return this.allTracks
+        .filter((t) => {
+          return (
+            (this.normalize(t.title).includes(this.normalQuery) ||
+              this.normalize(t.album).includes(this.normalQuery) ||
+              this.normalize(t.author).includes(this.normalQuery)) &&
+            !this.currentTracks.find(
+              (ct) => ct.parent === t.parent && ct.ref === t.ref
+            )
+          );
+        })
+        .map((t) => {
+          const alb = this.albums.find((a) => a.id === t.parent);
+          return { ...t, albumImg: alb.src, desc: alb.title };
+        });
+    },
+    allTracks() {
+      return this.albums.map((a) => a.tracks).flat(1);
     },
     normalQuery() {
       return this.normalize(this.searchQuery);
@@ -254,13 +272,18 @@ export default {
   }),
   methods: {
     normalize,
-    async addTrack (params) {
-      const [ref, parent, album, duration] = params
-      await this.$store.dispatch('addTrackToPlaylist', {id: this.current.id, album, ref, parent, duration })
-      this.$emit('pageMessage', 'ADDED_TO_PLAYLIST')
-
+    async addTrack(params) {
+      const [ref, parent, album, duration] = params;
+      await this.$store.dispatch("addTrackToPlaylist", {
+        id: this.current.id,
+        album,
+        ref,
+        parent,
+        duration,
+      });
+      this.$emit("pageMessage", "ADDED_TO_PLAYLIST");
     },
-   async setActiveAlbum() {
+    async setActiveAlbum() {
       const isAc = this.song
         ? !!this.currentTracks.find(
             (t) => t.ref === this.song.ref && t.parent === this.song.id
@@ -291,9 +314,8 @@ export default {
     },
     async sendToList() {
       // await this.$store.dispatch("getFirstSong", [this.currentTracks[0].parent, 0, this.current.id, true])
-      this.$store.commit('setPlaylistSongs', this.currentTracks) 
-     this.$router.push('/playlist')
-     
+      this.$store.commit("setPlaylistSongs", this.currentTracks);
+      this.$router.push("/playlist");
     },
     changeStylus(e) {
       this.backColor = e;
@@ -311,7 +333,9 @@ export default {
   },
   async mounted() {
     await this.changeStyle();
-    setTimeout(() => { this.loading = false })
+    setTimeout(() => {
+      this.loading = false;
+    });
   },
 };
 </script>
@@ -332,7 +356,6 @@ export default {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   justify-content: space-between;
-  
 }
 .hint-title {
   color: rgb(255, 255, 255);

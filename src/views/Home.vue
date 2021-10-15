@@ -3,7 +3,7 @@
     <Loader v-if="loading" />
     <div v-else>
       <GoodMorning @styleChanged="$emit('changeStyle', $event)" />
-      <div style="padding: 0px 32px 0px 32px">
+      <div style="padding: 0px 32px 0px 32px; gap: 16px" class="flex flex-col">
         <Recomends
           :title="'Recent Songs'"
           :template="albums"

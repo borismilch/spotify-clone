@@ -18,7 +18,7 @@ export default {
     message: "Плейліст видалено",
   },
   ADDED_TO_PLAYLIST: {
-    type: 'info',
-    message: "Трек добавлено"
-  }
+    type: "info",
+    message: "Трек добавлено",
+  },
 };

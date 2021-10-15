@@ -1,59 +1,14 @@
 <template>
   <section>
-    <Loader v-if="loading" />
-    <div v-else>
-      <h1 class="collection-title">Плейлісти</h1>
-      <div class="search-grid my-4">
-        <LikesBanner />
-        <AlbumCard
-          v-for="(rec, idx) in playlists"
-          :key="rec.id"
-          :rec="rec"
-          :idx="idx"
-        />
-      </div>
-    </div>
+    <h1 class="collection-title">Створити альбом</h1>
   </section>
 </template>
 
 <script>
-import Loader from "../components/Loader.vue";
-import LikesBanner from "../components/LikesBanner.vue";
-import { mapGetters } from "vuex";
-import AlbumCard from "../components/AlbumCard.vue";
-export default {
-  data: () => ({
-    loading: true,
-  }),
-  computed: {
-    ...mapGetters(["albums", "playlists", "likes"]),
-  },
-
-  components: {
-    AlbumCard,
-    LikesBanner,
-    Loader,
-  },
-  mounted() {
-    this.loading = false;
-    this.$emit("changeStyle", "#222222");
-  },
-};
+export default {};
 </script>
 
 <style lang="scss">
-.lpf {
-  gap: 20px;
-  height: 100%;
-  & h1 {
-    font-size: 32px;
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 36px;
-    text-transform: none;
-  }
-}
-
 section {
   padding: 76px 32px 0px 32px;
 }

@@ -47,13 +47,13 @@ export default {
       return this.albums.find((a) => a.id === this.song.id);
     },
     currentTracks() {
-      return  this.song ? this.curAlb.tracks : [];
+      return this.song ? this.curAlb.tracks : [];
     },
     playlistsTracks() {
-      return this.curAlb.tracks.map(t => {
-        const alb = this.albums.find(a => a.id === t.parent)
-        return {...t, albumImg: alb.src, desc: this.curAlb.title, }
-      })
+      return this.curAlb.tracks.map((t) => {
+        const alb = this.albums.find((a) => a.id === t.parent);
+        return { ...t, albumImg: alb.src, desc: this.curAlb.title };
+      });
     },
     slicedTracks() {
       return this.song
@@ -70,8 +70,14 @@ export default {
         : [];
     },
     slicedTracksP() {
-      return this.playListOn ? this.playListOn.slice(this.playListOn.findIndex(t => t.ref === this.song.ref && t.parent === this.song.id) + 1) : []
-    }
+      return this.playListOn
+        ? this.playListOn.slice(
+            this.playListOn.findIndex(
+              (t) => t.ref === this.song.ref && t.parent === this.song.id
+            ) + 1
+          )
+        : [];
+    },
   },
 };
 </script>

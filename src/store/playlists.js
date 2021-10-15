@@ -30,6 +30,7 @@ export default {
       playlists = Object.keys(playlists || []).map((key) => ({
         ...playlists[key],
         id: key,
+        tracks: Object.values(playlists[key].tracks || []),
       }));
       commit("setPlaylists", playlists);
     },
@@ -49,12 +50,15 @@ export default {
       await firebase.database().ref(`/users/${uid}/playlists/${id}`).remove();
       await dispatch("fetchPlaylists");
     },
-    async addTrackToPlaylist ({ dispatch }, params) {
-      const uid = await dispatch('getUid')
-      console.log(params)
-      await firebase.database().ref(`/users/${uid}/playlists/${params.id}/tracks`).push({...params})
-      await dispatch("fetchPlaylists")
-    }
+    async addTrackToPlaylist({ dispatch }, params) {
+      const uid = await dispatch("getUid");
+      console.log(params);
+      await firebase
+        .database()
+        .ref(`/users/${uid}/playlists/${params.id}/tracks`)
+        .push({ ...params });
+      await dispatch("fetchPlaylists");
+    },
   },
   getters: {
     playlists: (s) => s.playlists,

@@ -8,10 +8,11 @@
       />
 
       <div class="p-layout reletive w-full h-full">
-        <NavigationTop 
-        :bgCol="navColor" 
-        :navContent="navContent" 
-        @searching ="searchInCategories = $event" />
+        <NavigationTop
+          :bgCol="navColor"
+          :navContent="navContent"
+          @searching="searchInCategories = $event"
+        />
 
         <div class="pb-32">
           <router-view
@@ -41,7 +42,7 @@ export default {
     imageShown: false,
     navColor: "#121212",
     navContent: "",
-    searchInCategories: ''
+    searchInCategories: "",
   }),
   components: {
     HeadNav,

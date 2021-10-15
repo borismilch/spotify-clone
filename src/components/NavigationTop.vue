@@ -2,9 +2,8 @@
   <div
     id="navBar"
     ref="navBar"
-    style="z-index:1000"
+    style="z-index: 1000"
     class="
-      
       duration-200
       fixed
       w-full
@@ -62,7 +61,12 @@
         </button>
       </div>
       <Fade>
-        <v-col v-if="$route.meta.searchField" style="padding: 0px" class="flex mt-7 flex-col items-center justify-center" cols="12">
+        <v-col
+          v-if="$route.meta.searchField"
+          style="padding: 0px"
+          class="flex mt-7 flex-col items-center justify-center"
+          cols="12"
+        >
           <v-text-field
             filled
             @input="$emit('searching', $event)"
@@ -73,6 +77,29 @@
             placeholder="Пошук треків"
           ></v-text-field>
         </v-col>
+        <ul class="flex" v-if="this.$route.meta.collection">
+          <li>
+            <router-link
+              exact
+              active-class="active"
+              class="collection-link"
+              to="/collection/playlists"
+            >
+              <span> Плейлісти </span>
+            </router-link>
+          </li>
+
+          <li>
+            <router-link
+              class="collection-link"
+              exact
+              active-class="active"
+              to="/collection/create"
+            >
+              <span> Додати альбом </span>
+            </router-link>
+          </li>
+        </ul>
         <div
           v-if="scroll > 60 && this.$route.meta.player"
           class="flex gap-3 items-center"
@@ -171,5 +198,25 @@ export default {
   line-height: 48px;
   font-weight: 600;
   opacity: 0.8;
+}
+.collection-link {
+  border-radius: 4px;
+  color: #b2b2b2;
+  display: inline-block;
+  margin: 0 8px;
+  padding: 8px 16px;
+  position: relative;
+  text-decoration: none;
+  &.active {
+    background-color: #333 !important;
+    color: white;
+  }
+  & span {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: normal;
+    line-height: 16px;
+    text-transform: none;
+  }
 }
 </style>

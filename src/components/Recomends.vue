@@ -1,6 +1,6 @@
 <template>
   <div class="relative">
-    <div class="px-6 flex justify-between items-center mr-5">
+    <div class="px-6 my-3 flex justify-between items-center mr-5">
       <h1 class="text-2xl font-bold text-white tracking-wider hover:underline">
         {{ title }}
       </h1>
@@ -14,77 +14,29 @@
           hover:underline
         "
       >
-         See more
+        See more
       </h2>
     </div>
     <div class="flex w-full flex-nowrap gap-6">
-      <div
-        
+      <AlbumCard
         v-for="(rec, idx) in itemsToShow"
-        class="relative flex-1 bhover"
         :key="rec.src.slice(20) + idx"
+        :rec="rec"
+        :idx="idx"
       >
-        <router-link
-          :to="'/detail/' + rec.id"
-          style="min-height: 294px"
-          class="p-2 gover cursor-pointer relative"
-          :class="{ 'active-play': song ? song.id === rec.id : false }"
-        >
-          <div class="bg-sp-lignt w-full h-auto px-4 py-4 relative">
-            <img
-              style="object-fit: cover; height: 152px; max-height:200px"
-              :src="rec.src"
-              class="h-auto w-full shad mb-2"
-              :class="{ 'rounded-full': isAuthors }"
-              alt=""
-            />
-            <h1 style="text-overflow:ellipsis" class="text-sm mt-4 font-semibold text-white ">
-              {{ rec.title }}
-            </h1>
-            <h2 style="text-overflow:ellipsis; white-space: wrap; overflow:hidden; width: 100px" class="text-xs text-sp-ligntest my-2">
-              {{ rec.artist }}
-              ccccscokcokcoooooooooooooo
-            </h2>
-          </div>
-        </router-link>
-        <button
-          @click="setActiveAlbum(idx)"
-          class="
-            rounded-full
-            w-10
-            h-10
-            shadow
-            flex
-            items-center
-            justify-center
-            duration-300
-            bg-green-600
-            text-white
-            opacity-0
-            absolute
-            right-6
-            bottom-4
-          "
-        >
-          <v-icon>{{
-            (song ? rec.id === song.id && song.play : false)
-              ? "mdi-pause"
-              : "mdi-play"
-          }}</v-icon>
-        </button>
-      </div>
+      </AlbumCard>
     </div>
   </div>
 </template>
 
 <script>
+import AlbumCard from "./AlbumCard.vue";
 import { mapGetters } from "vuex";
 import images from "../utils/images";
 export default {
   props: {
     template: Array,
     title: String,
-    isAuthors: Boolean,
   },
   data: () => ({
     play: true,
@@ -118,17 +70,9 @@ export default {
     setSize() {
       this.screenWidth = window.innerWidth;
     },
-    async setActiveAlbum(idx) {
-      if (this.song ? this.song.id !== this.albums[idx].id : true) {
-        await this.$store.dispatch("getFirstSong", [
-          this.itemsToShow[idx].id,
-          0,
-        ]);
-        this.$store.commit('setPlaylistSongs', [])
-      } else if (this.song ? this.song.id === this.albums[idx].id : false) {
-        this.$store.commit("changeController", !this.controller);
-      }
-    },
+  },
+  components: {
+    AlbumCard,
   },
 };
 </script>

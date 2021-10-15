@@ -90,7 +90,7 @@ export default {
     async changeActivity(idx) {
       if (this.song ? this.song.ref !== this.tracks[idx].ref : true) {
         await this.setActiveAlbum(idx);
-        this.$store.commit('setPlaylistSongs', [])
+        this.$store.commit("setPlaylistSongs", []);
       } else {
         this.play = !this.play;
         this.$store.commit("changeController", this.play);

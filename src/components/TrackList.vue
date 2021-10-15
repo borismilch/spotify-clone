@@ -3,7 +3,6 @@
     <slot></slot>
     <ul style="z-index: 10" v-if="tracks.length">
       <li
-       
         class="flex justify-beetween relative py-2 px-2 items-center lich"
         :class="{ 'li-active': song ? li.ref === song.ref : false }"
         v-for="(li, idx) in this.$route.meta.player ? tracks : trackShow"
@@ -51,7 +50,13 @@
         >
           {{ new Date() | date }}
         </div>
-        <button class="add-button ml-10" @click.stop="$emit('addTrack', [li.ref, li.parent, li.album,li.duration])" v-if="buttons">
+        <button
+          class="add-button ml-10"
+          @click.stop="
+            $emit('addTrack', [li.ref, li.parent, li.album, li.duration])
+          "
+          v-if="buttons"
+        >
           <span>Додати</span>
         </button>
         <div class="flex items-center gap-4 ml-10" v-else>
@@ -131,7 +136,7 @@ export default {
   background-color: transparent;
 
   border: 1px solid #3b3838;
-  border-radius: 500px;;
+  border-radius: 500px;
   cursor: pointer;
   transition: all 0.2s ease;
   display: inline-block;
@@ -142,7 +147,7 @@ export default {
   padding: 8px 34px;
   text-align: center;
   text-transform: uppercase;
-  transition: all 33ms cubic-bezier(.3,0,0,1);
+  transition: all 33ms cubic-bezier(0.3, 0, 0, 1);
   white-space: nowrap;
   will-change: transform;
   color: #b3b3b3;
@@ -153,7 +158,7 @@ export default {
   & span {
     font-size: 12px;
     font-weight: 700;
-    letter-spacing: .1em;
+    letter-spacing: 0.1em;
     line-height: 16px;
     text-transform: uppercase;
   }

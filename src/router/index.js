@@ -29,12 +29,6 @@ const routes = [
     component: () => import("../views/Create.vue"),
   },
   {
-    path: "/lib",
-    name: "Lib",
-    meta: { auth: true },
-    component: () => import("../views/Lib.vue"),
-  },
-  {
     path: "/likes",
     name: "Likes",
     meta: { auth: true, player: true },
@@ -69,6 +63,18 @@ const routes = [
     name: "Genre",
     meta: { auth: true },
     component: () => import("../views/Genre.vue"),
+  },
+  {
+    path: "/collection/create",
+    name: "CreateAlbum",
+    meta: { auth: true, collection: true },
+    component: () => import("../views/CreateAlbum.vue"),
+  },
+  {
+    path: "/collection/playlists",
+    name: "CollectionP",
+    meta: { auth: true, collection: true },
+    component: () => import("../views/Lib.vue"),
   },
 ];
 

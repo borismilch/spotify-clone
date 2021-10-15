@@ -1,6 +1,14 @@
 <template>
   <div
-    class="w-64 z-50 fixed overflow-hidden bg-black h-full flex flex-col flex-grow-0"
+    class="
+      w-64
+      z-50
+      fixed
+      overflow-hidden
+      bg-black
+      h-full
+      flex flex-col flex-grow-0
+    "
   >
     <router-link to="/" tag="div">
       <img
@@ -235,7 +243,7 @@ export default {
         id: "2jy8hgujbjhkhikk",
         name: "Моя бібліотека",
         icon: "bookshelf",
-        to: "/lib",
+        to: "/collection/playlists",
       },
     ],
   }),

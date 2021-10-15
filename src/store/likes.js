@@ -8,13 +8,15 @@ export default {
     },
   },
   actions: {
-    async like({ dispatch }, params) {
+    async like({ dispatch, getters }, params) {
       const uid = await dispatch("getUid");
       let [id, ref] = params;
-      await firebase
-        .database()
-        .ref(`/users/${uid}/likes`)
-        .push({ id, ref, date: new Date().toLocaleDateString() });
+      await firebase.database().ref(`/users/${uid}/likes`).push({
+        id,
+        ref,
+        date: new Date().toLocaleDateString(),
+        author: getters.user.name,
+      });
       await dispatch("fetchAlbums");
     },
     async dislike({ dispatch }, params) {

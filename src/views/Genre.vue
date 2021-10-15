@@ -1,39 +1,44 @@
 <template>
-<div>
-  <Loader v-if="loading" />
-  <div v-else>
-  <div class="flex user-profile" style="background-color: #181818">
-     <div class="lay"></div>
-     <div class="user-credentials flex cursor-pointer" style="z-index: 10">
+  <div>
+    <Loader v-if="loading" />
+    <div v-else>
+      <div class="flex user-profile" style="background-color: #181818">
+        <div class="lay"></div>
+        <div class="user-credentials flex cursor-pointer" style="z-index: 10">
           <div
             class="user-info flex flex-col mx-6 justify-end mb-4"
             style="margin-top: 20px"
           >
-             <h1 class="fav-title-big">
-               {{$route.params.genre[0].toUpperCase() + $route.params.genre.slice(1)}}</h1>
-            <div class="flex items-center">
-             
-            </div>
+            <h1 class="fav-title-big">
+              {{
+                $route.params.genre[0].toUpperCase() +
+                $route.params.genre.slice(1)
+              }}
+            </h1>
+            <div class="flex items-center"></div>
           </div>
-    </div>
-    </div>
-     <div
-        class="lay2 z-10 absolute"
-        style="background-color: #181818"
-    ></div>
-     <div class="lay3 z-10 absolute"></div>
-        <div class="z-10" style="padding: 0px 32px 0px 32px; left:0">
-          <div>
-         <div class="flex flex-col gap-5" v-if="findedAlbs.length">
+        </div>
+      </div>
+      <div class="lay2 z-10 absolute" style="background-color: #181818"></div>
+      <div class="lay3 z-10 absolute"></div>
+      <div class="z-10" style="padding: 0px 32px 0px 32px; left: 0">
+        <div>
+          <div class="flex flex-col gap-5" v-if="findedAlbs.length">
             <div class="flex flex-col mt-6">
               <h1 class="detail-title z-50 font-bold">Плейлісти</h1>
-              <Recomends  :template="findedAlbs" :style="{width: (200 * findedAlbs.length) + 'px'}" />
+              <Recomends
+                :template="findedAlbs"
+                :style="{ width: 200 * findedAlbs.length + 'px' }"
+              />
             </div>
             <div class="flex flex-col mt-6">
               <h1 class="detail-title font-bold">Новинки</h1>
-              <Recomends :style="{width: (200 * findedAlbs.length) + 'px'}"  :template="newestAlbs" />
+              <Recomends
+                :style="{ width: 200 * findedAlbs.length + 'px' }"
+                :template="newestAlbs"
+              />
             </div>
-         </div>
+          </div>
 
           <p
             v-else
@@ -56,38 +61,40 @@
               >Перейти на головну</router-link
             >
           </p>
+        </div>
       </div>
+    </div>
   </div>
-  </div>
-</div>  
 </template>
 
 <script>
-import Loader from '../components/Loader.vue'
-import { mapGetters } from 'vuex'
-import Recomends from '../components/Recomends.vue'
+import Loader from "../components/Loader.vue";
+import { mapGetters } from "vuex";
+import Recomends from "../components/Recomends.vue";
 export default {
   data: () => ({
-    loading: true
+    loading: true,
   }),
   computed: {
     ...mapGetters(["albums"]),
-    findedAlbs () {
-      return this.albums.filter(a => a.genre === this.$route.params.genre)
+    findedAlbs() {
+      return this.albums.filter((a) => a.genre === this.$route.params.genre);
     },
-    newestAlbs () {
-      return [...this.findedAlbs].sort((a, b) => new Date(a.creationDate) < new Date(b.creationDate))
-    }
+    newestAlbs() {
+      return [...this.findedAlbs].sort(
+        (a, b) => new Date(a.creationDate) < new Date(b.creationDate)
+      );
+    },
   },
   components: {
     Recomends,
-    Loader
+    Loader,
   },
-  mounted () {
-    this.$emit('changeStyle', '#181818')
-    this.loading = false
-  }
-}
+  mounted() {
+    this.$emit("changeStyle", "#181818");
+    this.loading = false;
+  },
+};
 </script>
 <style lang="scss" scoped>
 .under {
@@ -157,7 +164,6 @@ export default {
   );
   height: 132px;
   position: absolute;
-
 }
 .font-light {
   font-weight: 300 !important;
