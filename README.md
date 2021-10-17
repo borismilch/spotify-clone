@@ -1,4 +1,4 @@
-# baligajsddd
+# Spotify clone
 
 ## Project setup
 ```
