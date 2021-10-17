@@ -1,6 +1,6 @@
 # Spotify clone
 
-## Project setup
+## https://buzzbizz-ce269.web.app/
 ```
 npm install
 ```
