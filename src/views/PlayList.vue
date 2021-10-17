@@ -32,6 +32,7 @@ import PlayList from "../components/TrackList.vue";
 import Loader from "../components/Loader.vue";
 import { mapGetters } from "vuex";
 export default {
+  metaInfo: { title: `Queue | Builofy ` },
   components: { PlayList, Loader },
   data: () => ({
     loading: true,

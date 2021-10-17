@@ -4,9 +4,9 @@
     <div v-else>
       <h1 class="collection-title">Плейлісти</h1>
       <div class="search-grid my-4">
-        <LikesBanner />
+        <ProfileBanner />
         <AlbumCard
-          v-for="(rec, idx) in playlists"
+          v-for="(rec, idx) in usersAlbums"
           :key="rec.id"
           :rec="rec"
           :idx="idx"
@@ -18,21 +18,24 @@
 
 <script>
 import Loader from "../components/Loader.vue";
-import LikesBanner from "../components/LikesBanner.vue";
+import ProfileBanner from "../components/ProfileBanner.vue";
 import { mapGetters } from "vuex";
 import AlbumCard from "../components/AlbumCard.vue";
 export default {
-  metaInfo: { title: `Playlists | Collection ` },
+  metaInfo: { title: `Albums | Collection ` },
   data: () => ({
     loading: true,
   }),
   computed: {
-    ...mapGetters(["albums", "playlists", "likes"]),
+    ...mapGetters(["albums", "playlists", "likes", "user"]),
+    usersAlbums() {
+      return this.albums.filter((a) => a.creator === this.user.id);
+    },
   },
 
   components: {
     AlbumCard,
-    LikesBanner,
+    ProfileBanner,
     Loader,
   },
   mounted() {

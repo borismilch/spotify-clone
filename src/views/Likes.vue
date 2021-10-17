@@ -117,6 +117,7 @@ import Loader from "../components/Loader.vue";
 import LikesLogo from "../assets/likes.png";
 import { mapGetters } from "vuex";
 export default {
+  metaInfo: { title: `Liked | Builofy ` },
   computed: {
     ...mapGetters(["albums", "user", "likes", "song", "controller"]),
 
@@ -198,12 +199,6 @@ export default {
   border-radius: 50%;
   font-size: 28px;
 }
-
-// {{
-//                 (song ? song.id === $route.params.id && song.play : false)
-//                 ? "mdi-pause"
-//                 : "mdi-play"
-//               }}
 .m-0 {
   margin: 0;
 }

@@ -10,10 +10,12 @@ export default {
   actions: {
     async like({ dispatch, getters }, params) {
       const uid = await dispatch("getUid");
-      let [id, ref] = params;
+      let [id, ref, album] = params;
+      console.log(params);
       await firebase.database().ref(`/users/${uid}/likes`).push({
         id,
         ref,
+        album,
         date: new Date().toLocaleDateString(),
         author: getters.user.name,
       });

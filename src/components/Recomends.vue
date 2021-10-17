@@ -1,6 +1,6 @@
 <template>
   <div class="relative">
-    <div class="px-6 my-3 flex justify-between items-center mr-5">
+    <div class="px-6 my-5 flex justify-between items-center mr-5">
       <h1 class="text-2xl font-bold text-white tracking-wider hover:underline">
         {{ title }}
       </h1>
@@ -12,17 +12,23 @@
           font-extrabold
           tracking-wider
           hover:underline
+          cursor-pointer
+        "
+        @click.stop="
+          $store.commit('setWhatMore', template);
+          $router.push('/showmore');
         "
       >
         See more
       </h2>
     </div>
-    <div class="flex w-full flex-nowrap gap-6">
+    <div class="search-grid gap-6">
       <AlbumCard
         v-for="(rec, idx) in itemsToShow"
         :key="rec.src.slice(20) + idx"
         :rec="rec"
         :idx="idx"
+        :group="group"
       >
       </AlbumCard>
     </div>
@@ -37,6 +43,7 @@ export default {
   props: {
     template: Array,
     title: String,
+    group: String,
   },
   data: () => ({
     play: true,
@@ -77,7 +84,13 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.search-grid {
+  grid-gap: 24px;
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
 .shad {
   box-shadow: 3px 3px 30px rgba(0, 0, 0, 0.603);
 }

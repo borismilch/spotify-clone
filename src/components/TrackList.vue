@@ -4,14 +4,25 @@
     <ul style="z-index: 10" v-if="tracks.length">
       <li
         class="flex justify-beetween relative py-2 px-2 items-center lich"
-        :class="{ 'li-active': song ? li.ref === song.ref : false }"
+        :class="{
+          'li-active': song
+            ? li.ref === song.ref && song.album === li.album
+            : false,
+        }"
         v-for="(li, idx) in this.$route.meta.player ? tracks : trackShow"
         :key="idx"
-        @click="setActiveAlbum(li.ref, li.parent)"
+        @click="setActiveAlbum(li.ref, li.parent, li.album)"
       >
-        <v-icon class="only-hover none" @click="changeActivity(li.ref)">
+        <v-icon
+          class="only-hover none"
+          @click="changeActivity(li.ref, li.parent, li.album)"
+        >
           {{
-            (song ? li.ref === song.ref && song.play : false)
+            (
+              song
+                ? li.ref === song.ref && song.album === li.album && song.play
+                : false
+            )
               ? "mdi-pause"
               : "mdi-play"
           }}
@@ -64,7 +75,7 @@
             @click.stop="
               li.liked = !li.liked;
               li.liked
-                ? like([li.parent, li.ref])
+                ? like([li.parent, li.ref, li.album])
                 : dislike([li.parent, li.ref]);
             "
             :style="{ color: li.liked ? '#1ed760' : '#a7a7a7' }"
@@ -97,18 +108,31 @@ export default {
 
   methods: {
     fmtMSS,
-    async setActiveAlbum(ref, id) {
+    async setActiveAlbum(ref, id, album) {
       const activeAlb = this.albums.find((a) => a.id === id);
       let idx = activeAlb.tracks.findIndex((t) => t.ref === ref);
-      if (this.song ? this.song.ref !== activeAlb.tracks[idx].ref : true) {
+      if (
+        this.song
+          ? this.song.ref !== activeAlb.tracks[idx].ref ||
+            this.song.album !== album
+          : true
+      ) {
+        console.log(id, idx, ref, album);
         await this.$store.dispatch("getFirstSong", [activeAlb.id, idx]);
         this.$store.commit("changePlay", true);
       }
     },
-    async changeActivity(ref) {
+    async changeActivity(ref, id, album) {
+      const activeAlb = this.albums.find((a) => a.id === id);
       let idx = this.tracks.findIndex((t) => t.ref === ref);
-      if (this.song.ref !== this.tracks[idx].ref) {
-        await this.setActiveAlbum(idx);
+      console.log(idx);
+      if (
+        this.song
+          ? this.song.ref !== activeAlb.tracks[idx].ref ||
+            this.song.album !== album
+          : true
+      ) {
+        await this.setActiveAlbum(ref, id);
       } else {
         this.play = !this.play;
         this.$store.commit("changeController", this.play);

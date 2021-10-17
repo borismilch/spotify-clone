@@ -14,13 +14,7 @@ export default {
     },
   },
   actions: {
-    async addAlbums({ dispatch }, alb) {
-      console.log(alb);
-      await firebase.database().ref("/albums").push(alb);
-      await dispatch("fetchAlbums");
-    },
     async fetchAlbums({ dispatch, commit }) {
-      // const uid = dispatch("getUid");
       let albums = (
         await firebase.database().ref("/albums").once("value")
       ).val();
@@ -35,7 +29,7 @@ export default {
         ...albums[key],
         author: albums[key].creator === uid,
         id: key,
-        tracks: albums[key].tracks.map((t) => ({
+        tracks: (albums[key].tracks || []).map((t) => ({
           ...t,
           parent: key,
           album: albums[key].title,
@@ -44,6 +38,37 @@ export default {
           ),
         })),
       }));
+    },
+    async addAlbums({ dispatch }, params) {
+      const [alb, audios, id] = params;
+      console.log(alb);
+      await firebase
+        .database()
+        .ref(`/albums/${id}`)
+        .update({ ...alb });
+      await dispatch("fetchAlbums");
+
+      alb.tracks.forEach(async (t, idx) => {
+        const storageRef = firebase.storage().ref();
+        const fileRef = storageRef.child(`${id}/${t.ref}`);
+
+        await fileRef.putString(audios[idx], "data_url");
+      });
+    },
+    async createEmptyAlbum({ dispatch }, alb) {
+      await firebase.database().ref("/albums").push(alb);
+      await dispatch("fetchAlbums");
+      let albums = (
+        await firebase.database().ref("/albums").once("value")
+      ).val();
+      albums = await dispatch("filterAlbums", albums);
+      const id = albums[albums.length - 1].id;
+      console.log(id);
+      return id;
+    },
+    async deleteAlbum({ dispatch }, id) {
+      await firebase.database().ref(`/albums/${id}`).remove();
+      await dispatch("fetchAlbums");
     },
   },
   getters: {

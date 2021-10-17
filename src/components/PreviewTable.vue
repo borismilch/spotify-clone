@@ -3,57 +3,24 @@
     <div class="table-head" style="margin-bottom: 16px; z-index: 10; top: 56px">
       <slot> </slot>
     </div>
-    <ul style="z-index: 20">
-      <li
-        @click="setActiveAlbum(idx)"
-        :class="{
-          'li-active': song ? song.id === id && tr.ref === song.ref : false,
-        }"
-        class="flex justify-beetween relative py-2 px-2 items-center lich"
+    <ul style="z-index: 20; padding: 0px 0.5rem">
+      <ListItem
         v-for="(tr, idx) in tracks"
         :key="idx"
-      >
-        <v-icon @click.stop="changeActivity(idx)" class="only-hover none">{{
-          (song ? song.id === id && tr.ref === song.ref && song.play : false)
-            ? "mdi-pause"
-            : "mdi-play"
-        }}</v-icon>
-        <span class="w-6 normal-text index text-center">{{ idx + 1 }}</span>
-
-        <div class="flex flex-col ml-2 flex-1" style="width: 50%">
-          <span class="normal-font-lg mb-2">{{ tr.title }}</span>
-          <span
-            class="
-              normal-font
-              hover:underline
-              font-light
-              cursor-pointer
-              opacity-90
-            "
-            >{{ tr.author }}</span
-          >
-        </div>
-
-        <div class="flex items-center gap-4">
-          <v-icon
-            @click.stop="
-              tr.liked = !tr.liked;
-              tr.liked
-                ? like([tr.parent, tr.ref, tr.album])
-                : dislike([tr.parent, tr.ref]);
-            "
-            :style="{ color: tr.liked ? '#1ed760' : '#a7a7a7' }"
-            >{{ tr.liked ? "mdi-heart" : "mdi-heart-outline" }}</v-icon
-          >
-          <span class="normal-font">{{ fmtMSS(tr.duration) }}</span>
-          <v-icon class="ubuntu">mdi-dots-horizontal</v-icon>
-        </div>
-      </li>
+        :tr="tr"
+        :id="id"
+        :idx="idx"
+        :tracks="tracks"
+        :album="album"
+        @removeItem="$emit('removeItem', idx)"
+        @changeItem="$emit('changeItem', idx)"
+      />
     </ul>
   </div>
 </template>
 
 <script>
+import ListItem from "./util/ListItem.vue";
 import { mapGetters } from "vuex";
 export default {
   data: () => ({
@@ -63,6 +30,7 @@ export default {
   props: {
     id: String,
     tracks: Array,
+    album: Object,
   },
   mounted() {
     window.addEventListener("scroll", this.onScroll);
@@ -77,33 +45,12 @@ export default {
     onScroll() {
       this.scroll = window.top.scrollY;
     },
-    async setActiveAlbum(idx) {
-      const activeAlb = this.albums.find((a) => a.id === this.$route.params.id);
-      if (this.song ? this.song.ref !== activeAlb.tracks[idx].ref : true) {
-        await this.$store.dispatch("getFirstSong", [activeAlb.id, idx]);
-        this.$store.commit("changePlay", true);
-      }
-    },
-    async changeActivity(idx) {
-      if (this.song ? this.song.ref !== this.tracks[idx].ref : true) {
-        await this.setActiveAlbum(idx);
-        this.$store.commit("setPlaylistSongs", []);
-      } else {
-        this.play = !this.play;
-        this.$store.commit("changeController", this.play);
-      }
-    },
-    async like(params) {
-      this.$emit("pageMessage", "USER_LIKED");
-      await this.$store.dispatch("like", params);
-    },
-    async dislike(params) {
-      this.$emit("pageMessage", "USER_DISLIKED");
-      await this.$store.dispatch("dislike", params);
-    },
   },
   computed: {
     ...mapGetters(["song", "albums"]),
+  },
+  components: {
+    ListItem,
   },
 };
 </script>

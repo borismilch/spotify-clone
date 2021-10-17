@@ -1,28 +1,27 @@
 <template>
   <div class="relative flex-1 bhover">
     <router-link
-      :to="rec.artist ? '/detail/' + rec.id : '/create/' + rec.id"
+      :to="'/user/' + user.id"
       style="min-height: 268px"
       class="gover cursor-pointer relative"
       :class="{
         'active-play': song
-          ? song.id === rec.id && song.group === group
+          ? song.id === albums.find(a => a.creator === user.id).id && song.group === group
           : false,
       }"
     >
       <div class="bg-sp-lignt w-full h-auto px-4 py-4 relative">
         <img
           style="object-fit: cover; height: 152px; max-height: 200px"
-          :src="rec.src || rec.img"
-          class="h-auto w-full shad mb-2"
-          :class="{ 'rounded-full': isAuthors }"
+          :src="user.avatar"
+          class="h-auto w-full shad mb-2 rounded-circle"
           alt=""
         />
         <h1
           style="text-overflow: ellipsis"
           class="text-sm mt-4 font-semibold text-white"
         >
-          {{ rec.title }}
+          {{ user.name }}
         </h1>
         <h2
           style="
@@ -33,12 +32,11 @@
           "
           class="text-xs text-sp-ligntest my-2"
         >
-          {{ rec.artist || user.name }}
+          {{ user.name }}
         </h2>
       </div>
     </router-link>
     <button
-      @click="rec.tracks.length ? setActiveAlbum(idx) : noop"
       class="
         rounded-full
         w-10
@@ -55,18 +53,11 @@
         right-6
         bottom-4
       "
+      @click="setActiveAlbum"
     >
       <v-icon>{{
-        (
-          song && rec.tracks[0]
-            ? (rec.id === song.id || rec.tracks[0].parent === song.id) &&
-              song.play &&
-              song.group === group
-            : false
-        )
-          ? "mdi-pause"
-          : "mdi-play"
-      }}</v-icon>
+      (song ? (song.id === albums.find(a => a.creator === user.id).id && song.play) : false) ?
+      'mdi-pause' : "mdi-play" }}</v-icon>
     </button>
   </div>
 </template>
@@ -76,29 +67,29 @@ import { mapGetters } from "vuex";
 export default {
   data: () => ({}),
   props: {
-    rec: Object,
+    user: Object,
     idx: Number,
-    isAuthors: Boolean,
-    fromPl: Boolean,
     group: String,
   },
   computed: {
-    ...mapGetters(["albums", "song", "controller", "user"]),
+    ...mapGetters(["albums", "song", "controller"]),
     isAlbum() {
-      return !!this.albums.find((a) => a.id === this.rec.id);
+      return !!this.albums.find((a) => a.id === this.user.id);
     },
   },
   methods: {
     async setActiveAlbum() {
       if (
         this.song
-          ? this.song.id !== this.rec.id || this.song.group !== this.group
+          ? this.song.id !==
+              (this.albums.find((a) => a.creator === this.user.id) || {}).id ||
+            this.song.group !== this.group
           : true
       ) {
         await this.$store.dispatch("getFirstSong", [
-          this.isAlbum ? this.rec.id : this.rec.tracks[0].parent,
+          this.albums.find((a) => a.creator === this.user.id).id,
           0,
-          this.rec.id,
+          "",
           this.group,
         ]);
         this.$store.commit("setPlaylistSongs", []);

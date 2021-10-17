@@ -5,11 +5,11 @@
       <div class="flex user-profile" :style="{ 'background-color': backColor }">
         <div class="overLay"></div>
         <div class="user-credentials flex cursor-pointer" style="z-index: 10">
-          <div class="user-avatar" style="position: relative">
+          <div class="user-avatar rounded-circle" style="position: relative">
             <v-img
               width="100%"
               height="100%"
-              :src="user.avatar"
+              :src="currentUser.avatar"
               class="rounded-circle shadow-av"
               alt=""
             />
@@ -26,11 +26,16 @@
             @click="dialog = true"
             class="user-info flex flex-col mx-6 justify-center"
           >
-            <span class="prof-text">Профіль</span>
-            <h1 class="prof-title">{{ user.name }}</h1>
-            <span class="spaan">Немає відкритих плейлістів</span>
+            <span v-if="currentUser.id === user.id" class="prof-text"
+              >Профіль</span
+            >
+            <h1 class="prof-title">{{ currentUser.name }}</h1>
+            <span class="spaan"
+              >Альбомів створено: {{ usersAlbums.length }}</span
+            >
           </div>
           <Dialog
+            v-if="currentUser.id === user.id"
             @changeStyle="changeStyle($event)"
             @onDialog="dialog = $event"
             :dialog="dialog"
@@ -38,21 +43,28 @@
         </div>
       </div>
       <div
-        class="lay2 z-10 absolute"
+        class="lay2 absolute"
         :style="{ 'background-color': backColor }"
       ></div>
-      <div class="lay3 z-10 absolute"></div>
-      <div style="z-index-50">
-        <span class="dots-w">...</span>
-        <TrackList />
-      </div>
-      <div class="">
-        <Recomends
-          :title="'Відкриті плейлісти'"
-          :template="cutoms"
-          :isAuthors="false"
-        />
-      </div>
+      <div class="lay3 absolute"></div>
+      <section>
+        <div class="z-index-50 mb-3">
+          <v-icon class="dots-w">mdi-dots-horizontal</v-icon>
+          <AlbumsList v-if="usersAlbums.length" :albums="usersAlbums">
+            <div class="z-50">
+              <h1 class="list-title mb-3">Авторські альбоми:</h1>
+              <ListHeader :noAlbs="true" />
+            </div>
+          </AlbumsList>
+        </div>
+        <div>
+          <Recomends
+            :title="'Відкриті плейлісти'"
+            :template="usersAlbums"
+            :isAuthors="false"
+          />
+        </div>
+      </section>
     </div>
   </div>
 </template>
@@ -60,30 +72,30 @@
 <script>
 import Dialog from "../components/ProfileModal.vue";
 import Recomends from "../components/Recomends.vue";
+import ListHeader from "../components/util/ListHeader.vue";
 import Loader from "../components/Loader.vue";
 import { mapGetters } from "vuex";
-import TrackList from "../components/TrackList.vue";
+import AlbumsList from "../components/util/AlbumList.vue";
 import doom from "../assets/doom.jpg";
 export default {
-  components: { TrackList, Recomends, Dialog, Loader },
+  metaInfo: { title: `Profile | Builofy ` },
+  components: { AlbumsList, Recomends, Dialog, Loader, ListHeader },
   data: () => ({
     loading: true,
     dialog: false,
     backColor: "",
     doom,
-    cutoms: [
-      { src: "breeze", title: "Daily mix 2", artist: "By Builofy" },
-      { src: "chuska", title: "Daily mix 1", artist: "By Builofy" },
-      { src: "doom", title: "Daily mix 4", artist: "By Mick Gordon" },
-      { src: "steampunk", title: "Daily mix 8", artist: "By Stepan" },
-      { src: "sun", title: "Daily mix 9", artist: "By Builofy" },
-      { src: "breeze", title: "Daily mix 2", artist: "By Builofy" },
-    ],
   }),
   computed: {
-    ...mapGetters(["user"]),
+    ...mapGetters(["user", "users", "albums"]),
     trackShow() {
       return this.trackList.slice(0, 4);
+    },
+    currentUser() {
+      return this.users.find((u) => u.id === this.$route.params.id);
+    },
+    usersAlbums() {
+      return this.albums.filter((a) => a.creator === this.$route.params.id);
     },
   },
   methods: {
@@ -98,10 +110,14 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+section {
+  padding: 0px 32px 0px 32px;
+}
 .z-50 {
   z-index: 50 !important;
 }
 .lay2 {
+  z-index: 0 !important;
   height: 232px;
   position: absolute;
   width: 100%;
@@ -109,6 +125,7 @@ export default {
   border-bottom: 2px solid #727272;
 }
 .lay3 {
+  z-index: 0 !important;
   background: linear-gradient(
     180deg,
     rgba(0, 0, 0, 0.5973739837731968) 2%,
@@ -175,7 +192,7 @@ export default {
   }
 }
 .shadow-av {
-  box-shadow: 5px 5px 40px #242424;
+  box-shadow: 5px 5px 10px #111111;
 }
 .user-profile {
   position: relative;
@@ -216,6 +233,7 @@ export default {
 .dots-w {
   padding: 10px 10px 24px 36px;
   font-size: 38px;
+  transform: translate(-30px, 10px);
   position: relative;
 }
 .list-title {

@@ -26,8 +26,14 @@
         :style="{ 'background-color': backColor }"
       ></div>
       <div class="lay3 z-10 absolute"></div>
-      <div style="z-index-50">
-        <span class="dots-w">...</span>
+      <div
+        style="z-index-50"
+        @click="$router.push('/collection/create/' + current.id)"
+        v-if="current.creator === user.id"
+      >
+        <span class="dots-w">
+          <v-icon>mdi-pencil</v-icon>
+        </span>
       </div>
       <div class="z-10" style="padding: 0px 32px 0px 32px">
         <TrackTable
@@ -66,6 +72,7 @@ import analyze from "rgbaster";
 
 import { mapGetters } from "vuex";
 export default {
+  metaInfo: { title: "Album | Builofy" },
   computed: {
     ...mapGetters(["albums", "user"]),
     current() {
@@ -126,10 +133,11 @@ export default {
   height: 232px;
   position: absolute;
   width: 100%;
-
+  z-index: 0 !important;
   border-bottom: 2px solid #727272;
 }
 .lay3 {
+  z-index: 0 !important;
   background: linear-gradient(
     180deg,
     rgba(0, 0, 0, 0.673739837731968) 2%,
@@ -248,9 +256,20 @@ export default {
   text-transform: none;
 }
 .dots-w {
-  padding: 10px 10px 24px 36px;
+  padding: 20px 10px 24px 36px;
   font-size: 38px;
+  cursor: pointer;
+
   position: relative;
+  & i {
+    color: #b2b2b2 !important;
+    transform: translateY(10px);
+  }
+  &:hover {
+    & i {
+      color: #fff !important;
+    }
+  }
 }
 .list-title {
   font-size: 24px;

@@ -5,17 +5,40 @@
       <GoodMorning @styleChanged="$emit('changeStyle', $event)" />
       <div style="padding: 0px 32px 0px 32px; gap: 16px" class="flex flex-col">
         <Recomends
-          :title="'Recent Songs'"
+          :title="'All Albums'"
           :template="albums"
           :isAuthors="false"
+          :group="'recent-home'"
         />
-        <Recomends :title="'New songs'" :template="albums" :isAuthors="false" />
+        <Recomends
+          :title="'New Albums'"
+          :template="newAlbums"
+          :group="'newest-home'"
+          :isAuthors="false"
+        />
+        <div class="flex flex-col">
+          <h1
+            class="text-2xl font-bold text-white tracking-wider hover:underline"
+            style="margin: 20px"
+          >
+            Виконавці
+          </h1>
+          <div class="search-grid">
+            <AuthorCard
+              v-for="user in users"
+              :key="user.id"
+              :group="'authors'"
+              :user="user"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import AuthorCard from "../components/AuthorCard.vue";
 import music from "../utils/music";
 import albs from "../utils/albums";
 import Loader from "../components/Loader.vue";
@@ -23,36 +46,29 @@ import { mapGetters } from "vuex";
 import Recomends from "../components/Recomends.vue";
 import GoodMorning from "../components/Recomendations.vue";
 export default {
+  metaInfo: { title: `Home | Builofy ` },
   components: {
     Recomends,
+    AuthorCard,
     GoodMorning,
     Loader,
   },
-  computed: { ...mapGetters(["albums", "user"]) },
+
   data: () => ({
     albs,
     music,
     loading: true,
   }),
-  // mounted() {
-  //   setTimeout(async () => {
-  //     const updatedAlbums = this.albs.map((alb) => ({
-  //       ...alb,
-  //       tracks: alb.tracks
-  //         .filter((t) => !!music[t.ref])
-  //         .map((t) => ({
-  //           ...t,
-  //           duration: this.music[t.ref].duration,
-  //           title: t.ref[0].toUpperCase() + t.ref.slice(1),
-  //           author: this.user.name,
-  //         })),
-  //     }));
-
-  //   }, 300);
-  // },
+  computed: {
+    ...mapGetters(["albums", "user", "users"]),
+    newAlbums() {
+      return [...this.albums].reverse();
+    },
+  },
   mounted() {
     setTimeout(async () => {
       await this.$store.dispatch("fetchPlaylists");
+      await this.$store.dispatch("fetchUsers");
       this.loading = false;
     }, 200);
   },
@@ -71,6 +87,12 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 50%;
   background: #d1d1d1 !important;
   margin-top: -4px;
+}
+.search-grid {
+  grid-gap: 24px;
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
 }
 .lay {
   display: block;

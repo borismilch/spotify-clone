@@ -33,7 +33,7 @@
         active-class="active3"
         exact
         tag="li"
-        to="/user"
+        :to="'/user/' + user.id"
       >
         <v-icon>mdi-account-wrench</v-icon>
         Профіль</router-link

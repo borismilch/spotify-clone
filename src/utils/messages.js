@@ -21,4 +21,12 @@ export default {
     type: "info",
     message: "Трек добавлено",
   },
+  ALBUM_CREATED: {
+    type: "success",
+    message: "Альбом створено",
+  },
+  ALBUM_DELETED: {
+    type: "info",
+    message: "Альбом видалено",
+  },
 };

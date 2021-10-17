@@ -15,7 +15,7 @@ import week from "../assets/categories/week.jpeg";
 import doom from "../assets/doom.jpg";
 
 export default [
-  { title: "Для тебе", color: "rgb(30, 50, 100)", img: forYou },
+  { title: "For you", color: "rgb(30, 50, 100)", img: forYou },
 
   { title: "Charts", color: "rgb(141, 103, 171)", img: charts },
 

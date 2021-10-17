@@ -3,6 +3,7 @@ import firebase from "firebase/compat/app";
 export default {
   state: {
     user: null,
+    users: [],
   },
   mutations: {
     setUser(state, user) {
@@ -10,6 +11,9 @@ export default {
     },
     clearInfo(state) {
       state.user = null;
+    },
+    setUsers(state, users) {
+      state.users = users;
     },
   },
   actions: {
@@ -58,12 +62,22 @@ export default {
         .ref(`/users/${uid}/info`)
         .update({ ...updatedUser });
       commit("setUser", updatedUser);
+      await dispatch("fetchUsers");
     },
     getUid() {
       return firebase.auth().currentUser.uid || null;
     },
+    async fetchUsers({ commit }) {
+      let users = (await firebase.database().ref("/users").once("value")).val();
+      users = Object.keys(users).map((key) => ({
+        ...users[key],
+        ...users[key].info,
+      }));
+      commit("setUsers", users);
+    },
   },
   getters: {
     user: (s) => s.user,
+    users: (s) => s.users,
   },
 };

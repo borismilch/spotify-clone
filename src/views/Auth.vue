@@ -56,6 +56,7 @@
 
 <script>
 export default {
+  metaInfo: { title: "Auth | Builofy" },
   data: () => ({
     hold: false,
     valid: true,

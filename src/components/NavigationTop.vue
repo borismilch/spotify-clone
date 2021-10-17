@@ -61,74 +61,82 @@
         </button>
       </div>
       <Fade>
-        <v-col
-          v-if="$route.meta.searchField"
-          style="padding: 0px"
-          class="flex mt-7 flex-col items-center justify-center"
-          cols="12"
-        >
-          <v-text-field
-            filled
-            @input="$emit('searching', $event)"
-            rounded
-            dense
-            clearable
-            prepend-inner-icon="mdi-magnify"
-            placeholder="Пошук треків"
-          ></v-text-field>
-        </v-col>
-        <ul class="flex" v-if="this.$route.meta.collection">
-          <li>
-            <router-link
-              exact
-              active-class="active"
-              class="collection-link"
-              to="/collection/playlists"
-            >
-              <span> Плейлісти </span>
-            </router-link>
-          </li>
-
-          <li>
-            <router-link
-              class="collection-link"
-              exact
-              active-class="active"
-              to="/collection/create"
-            >
-              <span> Додати альбом </span>
-            </router-link>
-          </li>
-        </ul>
-        <div
-          v-if="scroll > 60 && this.$route.meta.player"
-          class="flex gap-3 items-center"
-        >
-          <div
-            @click="setActiveAlbum"
-            style="width: 40px; height: 40px"
-            class="
-              rounded-full
-              shadow
-              flex
-              text-bold
-              items-center
-              justify-center
-              duration-300
-              bg-green-600
-              text-white
-              p-2
-              player
-              hov-scale
-            "
+        <div class="flex">
+          <v-col
+            v-if="$route.meta.searchField"
+            style="padding: 0px"
+            class="flex mt-7 flex-col items-center justify-center"
+            cols="12"
           >
-            <v-icon class="text-xl">{{
-              (song ? song.id === $route.params.id && song.play : false)
-                ? "mdi-pause"
-                : "mdi-play"
-            }}</v-icon>
+            <v-text-field
+              filled
+              @input="$emit('searching', $event)"
+              rounded
+              dense
+              clearable
+              prepend-inner-icon="mdi-magnify"
+              placeholder="Пошук треків"
+            ></v-text-field>
+          </v-col>
+          <ul class="flex" v-else-if="this.$route.meta.collection">
+            <li>
+              <router-link
+                exact
+                active-class="active"
+                class="collection-link"
+                to="/collection/playlists"
+              >
+                <span> Плейлісти </span>
+              </router-link>
+            </li>
+
+            <li v-if="myAlbums.length">
+              <router-link
+                exact
+                active-class="active"
+                class="collection-link"
+                to="/collection/albums"
+              >
+                <span> Альбоми </span>
+              </router-link>
+            </li>
+
+            <li>
+              <button class="collection-link" @click="createEmptyAlbum">
+                <span> Додати альбом </span>
+              </button>
+            </li>
+          </ul>
+          <div
+            v-else-if="scroll > 60 && this.$route.meta.player"
+            class="flex gap-3 items-center"
+          >
+            <div
+              @click="setActiveAlbum"
+              style="width: 40px; height: 40px"
+              class="
+                rounded-full
+                shadow
+                flex
+                text-bold
+                items-center
+                justify-center
+                duration-300
+                bg-green-600
+                text-white
+                p-2
+                player
+                hov-scale
+              "
+            >
+              <v-icon class="text-xl">{{
+                (song ? song.id === $route.params.id && song.play : false)
+                  ? "mdi-pause"
+                  : "mdi-play"
+              }}</v-icon>
+            </div>
+            <span class="spa">{{ navContent }}</span>
           </div>
-          <span class="spa">{{ navContent }}</span>
         </div>
       </Fade>
     </div>
@@ -137,6 +145,7 @@
 </template>
 
 <script>
+import delaultImg from "../utils/default";
 import { mapGetters } from "vuex";
 import Fade from "../components/util/transition.vue";
 import UserDropdown from "./UserDropdown.vue";
@@ -147,12 +156,16 @@ export default {
   },
   data: () => ({
     scroll: 0,
+    emptyAlbImg: delaultImg.img,
   }),
   components: { UserDropdown, Fade },
   computed: {
-    ...mapGetters(["song", "albums", "controller"]),
+    ...mapGetters(["song", "albums", "controller", "user"]),
     isScrolled() {
       return this.$refs.navBar.parent;
+    },
+    myAlbums() {
+      return this.albums.filter((a) => a.creator === this.user.id);
     },
   },
   mounted() {
@@ -176,6 +189,19 @@ export default {
         this.$store.commit("changeController", !this.controller);
       }
     },
+    async createEmptyAlbum() {
+      const id = await this.$store.dispatch("createEmptyAlbum", {
+        src: this.emptyAlbImg,
+        title: "New Album",
+        description: "",
+        tracks: [],
+        artist: "",
+        creationDate: "",
+        genre: "",
+        likes: 0,
+      });
+      this.$router.push("/collection/create/" + id);
+    },
   },
 };
 </script>
@@ -188,6 +214,34 @@ export default {
   cursor: pointer;
   &:hover {
     transform: scale(1.1);
+  }
+}
+.modal-button {
+  cursor: pointer;
+  margin-left: auto;
+  width: 130px;
+  padding: 6px 0px;
+  background-color: #181818;
+  color: #fff;
+  border: 2px solid transparent;
+  border-radius: 500px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.76px;
+  line-height: 18px;
+  text-align: center;
+  text-transform: uppercase;
+  -webkit-transition: all 33ms cubic-bezier(0.3, 0, 0, 1);
+  transition: all 33ms cubic-bezier(0.3, 0, 0, 1);
+  white-space: nowrap;
+  transition: 0.1s;
+  &:hover {
+    background-color: #fff;
+    color: #181818;
+  }
+  &:disabled {
+    opacity: 0.4;
   }
 }
 .spa {

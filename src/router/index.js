@@ -35,7 +35,7 @@ const routes = [
     component: () => import("../views/Likes.vue"),
   },
   {
-    path: "/user",
+    path: "/user/:id",
     name: "User",
     meta: { auth: true },
     component: () => import("../views/User.vue"),
@@ -65,7 +65,7 @@ const routes = [
     component: () => import("../views/Genre.vue"),
   },
   {
-    path: "/collection/create",
+    path: "/collection/create/:id",
     name: "CreateAlbum",
     meta: { auth: true, collection: true },
     component: () => import("../views/CreateAlbum.vue"),
@@ -75,6 +75,18 @@ const routes = [
     name: "CollectionP",
     meta: { auth: true, collection: true },
     component: () => import("../views/Lib.vue"),
+  },
+  {
+    path: "/collection/albums",
+    name: "CollectionA",
+    meta: { auth: true, collection: true },
+    component: () => import("../views/UsersAlbums.vue"),
+  },
+  {
+    path: "/showmore",
+    name: "ShowMore",
+    meta: { auth: true },
+    component: () => import("../views/ShowMore.vue"),
   },
 ];
 

@@ -26,17 +26,11 @@
           <div class="flex flex-col gap-5" v-if="findedAlbs.length">
             <div class="flex flex-col mt-6">
               <h1 class="detail-title z-50 font-bold">Плейлісти</h1>
-              <Recomends
-                :template="findedAlbs"
-                :style="{ width: 200 * findedAlbs.length + 'px' }"
-              />
+              <Recomends :template="findedAlbs" :group="'genre-albs'" />
             </div>
             <div class="flex flex-col mt-6">
               <h1 class="detail-title font-bold">Новинки</h1>
-              <Recomends
-                :style="{ width: 200 * findedAlbs.length + 'px' }"
-                :template="newestAlbs"
-              />
+              <Recomends :template="newestAlbs" :group="'genre-newest'" />
             </div>
           </div>
 
@@ -72,6 +66,7 @@ import Loader from "../components/Loader.vue";
 import { mapGetters } from "vuex";
 import Recomends from "../components/Recomends.vue";
 export default {
+  metaInfo: { title: `Genre | Genres ` },
   data: () => ({
     loading: true,
   }),

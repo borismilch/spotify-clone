@@ -6,7 +6,7 @@
           style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap"
         >
           <span class="mr-3" v-for="l in likes" :key="l.id + l.ref">
-            <span>{{ l.author }}</span>
+            <span>{{ l.author }} </span>
             <span style="opacity: 0.7">{{
               l.ref[0].toUpperCase() + l.ref.slice(1)
             }}</span>
@@ -14,7 +14,7 @@
         </div>
       </div>
       <div>
-        <h1>Любимі {{ findNeededIdx }} треки</h1>
+        <h1>Любимі треки</h1>
         <span>2 любимі треки</span>
       </div>
     </div>

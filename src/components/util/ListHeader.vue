@@ -12,7 +12,13 @@
         <span class="list-title" style="font-size: 20px">#</span>
         <span class="normal-font flex-1">Назва</span>
       </div>
-      <span style="color: #b3b3b3; flex: 0.3 0 auto" class="ml-2"> Альбом</span>
+      <span
+        v-if="!noAlbs"
+        style="color: #b3b3b3; flex: 0.3 0 auto"
+        class="ml-2"
+      >
+        Альбом</span
+      >
       <span
         v-if="timed"
         style="color: #b3b3b3; flex: 0.3 0 auto !important"
@@ -32,6 +38,7 @@
 export default {
   props: {
     timed: Boolean,
+    noAlbs: Boolean,
   },
 };
 </script>

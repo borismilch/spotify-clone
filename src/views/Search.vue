@@ -72,6 +72,7 @@ import Fade from "../components/util/transition.vue";
 import doom from "../assets/categories/metaljpg.jpg";
 import genres from "../utils/categories";
 export default {
+  metaInfo: { title: `Categories | Builofy ` },
   data: () => ({
     loading: true,
     doom,

@@ -80,6 +80,7 @@
 
 <script>
 export default {
+  metaInfo: { title: `Registration | Builofy ` },
   data: () => ({
     hold: false,
     valid: true,

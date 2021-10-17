@@ -43,8 +43,17 @@
           style="object-fit: cover; width: 50px; height: 50px"
         />
       </div>
-      <div style="width: 80px; overflow-hidden; text-overflow: ellipsis">
-        <h1 class="text-sm text-white tracking-wide">
+      <div style="width: 80px">
+        <h1
+          class="text-sm text-white tracking-wide"
+          style="
+            position: relative;
+            width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          "
+        >
           {{ song ? song.title : "Ви нічого не вибрали" }}
         </h1>
         <router-link
@@ -59,7 +68,9 @@
         class="text-sp-green icon-hover mx-3 text-lg cursor-pointer"
         @click.stop="
           song.liked = !song.liked;
-          song.liked ? like([song.id, song.ref]) : dislike([song.id, song.ref]);
+          song.liked
+            ? like([song.id, song.ref, song.album])
+            : dislike([song.id, song.ref]);
         "
         :style="{ color: song.liked ? '#1ed760' : '#a7a7a7' }"
         >{{ song.liked ? "mdi-heart" : "mdi-heart-outline" }}</v-icon
@@ -203,6 +214,18 @@ export default {
           this.track.play(); //play
           this.play = true;
           this.$store.commit("changePlay", this.play);
+        } else if (
+          oldval.group !== val.group &&
+          this.track &&
+          oldval.id === val.id
+        ) {
+          this.track.setAttribute("src", val.url); //change the source
+          this.track.load(); //load the new source
+          this.track.play(); //play
+          this.play = true;
+          this.$store.commit("changePlay", this.play);
+        } else if (val === "") {
+          this.track = null;
         }
       },
     },

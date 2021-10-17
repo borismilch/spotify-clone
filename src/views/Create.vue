@@ -210,6 +210,7 @@ import Loader from "../components/Loader.vue";
 import DefaultImg from "../utils/default";
 import { mapGetters } from "vuex";
 export default {
+  metaInfo: { title: "Playlist | Builofy" },
   computed: {
     ...mapGetters(["albums", "user", "song", "controller", "playlists"]),
     current() {
@@ -313,7 +314,6 @@ export default {
       this.$router.push("/create/" + this.playlists[this.currentIdx].id);
     },
     async sendToList() {
-      // await this.$store.dispatch("getFirstSong", [this.currentTracks[0].parent, 0, this.current.id, true])
       this.$store.commit("setPlaylistSongs", this.currentTracks);
       this.$router.push("/playlist");
     },
